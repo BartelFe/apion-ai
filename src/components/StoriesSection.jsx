@@ -45,10 +45,26 @@ const STORIES = [
 
 export default function StoriesSection() {
   const sectionRef = useRef(null);
+  const headerRef = useRef(null);
   const storyRefs = useRef([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const headerLines = headerRef.current?.querySelectorAll('.reveal-line > span');
+      if (headerLines?.length) {
+        gsap.fromTo(
+          headerLines,
+          { yPercent: 110 },
+          {
+            yPercent: 0,
+            duration: 1.1,
+            stagger: 0.12,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: headerRef.current, start: 'top 65%', once: true },
+          }
+        );
+      }
+
       storyRefs.current.forEach((story) => {
         if (!story) return;
         const headline = story.querySelectorAll('.reveal-line > span');
@@ -107,7 +123,7 @@ export default function StoriesSection() {
       className="relative px-5 md:px-10 pt-32 md:pt-40 pb-32 md:pb-40"
     >
       <div className="max-w-5xl mx-auto">
-        <div className="mb-24 md:mb-32 text-center">
+        <div className="mb-24 md:mb-32 text-center" ref={headerRef}>
           <div className="mono-eyebrow inline-flex items-center gap-3" style={{ color: 'var(--fg-muted)' }}>
             <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
             03 · drei geschichten
@@ -121,8 +137,8 @@ export default function StoriesSection() {
               maxWidth: '780px',
             }}
           >
-            <span className="block">Drei Betriebe.</span>
-            <span className="block">Drei <em>Übeltäter</em>.</span>
+            <span className="reveal-line"><span>Drei Betriebe.</span></span>
+            <span className="reveal-line"><span>Drei <em>Übeltäter</em>.</span></span>
             <span className="block" style={{ color: 'var(--fg-muted)' }}>Pseudonymisiert. Mathematisch realistisch.</span>
           </h2>
         </div>

@@ -25,8 +25,8 @@ export default function BgStage() {
     const tweenTo = (mode) => {
       const m = bgModes[mode] || bgModes.light;
       gsap.to(root, {
-        duration: 0.9,
-        ease: 'power2.inOut',
+        duration: 0.5,
+        ease: 'power2.out',
         '--bg-center': m.center,
         '--bg-edge': m.edge,
         '--fg': m.fg,
@@ -48,8 +48,8 @@ export default function BgStage() {
       const mode = sec.getAttribute('data-bg');
       const t = ScrollTrigger.create({
         trigger: sec,
-        start: 'top 88%',
-        end: 'bottom 12%',
+        start: 'top 95%',
+        end: 'bottom 5%',
         onEnter: () => tweenTo(mode),
         onEnterBack: () => tweenTo(mode),
       });

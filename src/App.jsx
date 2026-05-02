@@ -21,8 +21,7 @@ export default function App() {
   useLenis();
 
   useEffect(() => {
-    const timer = setTimeout(() => ScrollTrigger.refresh(), 300);
-    return () => clearTimeout(timer);
+    document.fonts.ready.then(() => ScrollTrigger.refresh());
   }, []);
 
   return (
