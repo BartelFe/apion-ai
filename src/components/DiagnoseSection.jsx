@@ -120,7 +120,7 @@ export default function DiagnoseSection() {
       ref={sectionRef}
       data-bg="vignette"
       className="relative"
-      style={{ height: '400vh' }}
+      style={{ height: '400vh', background: '#08070A' }}
     >
       <div
         ref={stickyRef}

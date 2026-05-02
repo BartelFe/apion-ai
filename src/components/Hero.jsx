@@ -9,28 +9,42 @@ export default function Hero() {
 
   useEffect(() => {
     let ctx;
+    let cancelled = false;
+
     document.fonts.ready.then(() => {
+      if (cancelled) return;
+
       ctx = gsap.context(() => {
+        // Set initial states explicitly before animating
+        gsap.set('#hero-eyebrow', { opacity: 0 });
+        gsap.set('#hero-data', { opacity: 0 });
+        gsap.set('#hero-cta', { opacity: 0 });
+        gsap.set(['#hero-canvas-meta', '#hero-canvas-legend'], { opacity: 0 });
+        gsap.set('#hero-scroll', { opacity: 0 });
+        // y:0 explicitly clears the pixel-y value GSAP reads from the CSS
+        // translateY(110%) — without it, yPercent stacks on top and stays
+        // clamped even after animation finishes.
+        gsap.set('#hero-headline .reveal-line > span', { y: 0, yPercent: 110 });
+
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-        tl.to('#hero-eyebrow', { opacity: 1, duration: 0.5 }, 0.3);
-        tl.fromTo(
+        tl.to('#hero-eyebrow', { opacity: 1, duration: 0.6 }, 0.2);
+        tl.to(
           '#hero-headline .reveal-line > span',
-          { yPercent: 110 },
-          { yPercent: 0, duration: 1.1, stagger: 0.12 },
-          0.5,
+          { yPercent: 0, duration: 1.2, stagger: 0.14 },
+          0.45,
         );
-        tl.to('#hero-data', { opacity: 1, duration: 0.7 }, 1.8);
-        tl.to('#hero-cta', { opacity: 1, duration: 0.7 }, 2.0);
-        tl.to(['#hero-canvas-meta', '#hero-canvas-legend'], { opacity: 1, duration: 0.6, stagger: 0.1 }, 1.4);
-        tl.to('#hero-scroll', { opacity: 1, duration: 0.6 }, 2.4);
+        tl.to(['#hero-canvas-meta', '#hero-canvas-legend'], { opacity: 1, duration: 0.7, stagger: 0.1 }, 1.1);
+        tl.to('#hero-data', { opacity: 1, y: 0, duration: 0.8 }, 1.6);
+        tl.to('#hero-cta', { opacity: 1, duration: 0.7 }, 1.9);
+        tl.to('#hero-scroll', { opacity: 1, duration: 0.6 }, 2.3);
 
         const animateCount = (key, target) => {
           const obj = { v: 0 };
           gsap.to(obj, {
             v: target,
-            duration: 1.5,
-            delay: 1.9,
+            duration: 1.6,
+            delay: 1.8,
             ease: 'power2.out',
             onUpdate: () => setCounters((c) => ({ ...c, [key]: Math.round(obj.v) })),
           });
@@ -41,7 +55,11 @@ export default function Hero() {
 
       setActive(true);
     });
-    return () => ctx?.revert();
+
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
   }, []);
 
   return (
@@ -65,8 +83,8 @@ export default function Hero() {
         {/* Linke Spalte */}
         <div className="md:col-span-5 flex flex-col justify-between pt-6 md:pt-8 pl-4 md:pl-8">
           <div>
-            <div id="hero-eyebrow" className="opacity-0 mono-eyebrow flex items-center gap-3"
-              style={{ color: 'var(--fg-muted)' }}>
+            <div id="hero-eyebrow" className="mono-eyebrow flex items-center gap-3"
+              style={{ color: 'var(--fg-muted)', opacity: 0 }}>
               <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
               apion · prozessautomatisierung für den mittelstand
             </div>
@@ -84,13 +102,13 @@ export default function Hero() {
               </span>
             </h1>
 
-            <div id="hero-data" className="opacity-0 mt-10 flex items-end gap-8">
+            <div id="hero-data" className="mt-10 flex items-end gap-8" style={{ opacity: 0 }}>
               <DataBlock label="Sichtbare Verbindungen" value={counters.visible} unit="aktiv" />
               <DataBlock label="Unsichtbare Übergaben" value={counters.hidden} unit="erkannt" trace />
             </div>
           </div>
 
-          <div id="hero-cta" className="opacity-0 flex items-center gap-6 mt-auto pb-4">
+          <div id="hero-cta" className="flex items-center gap-6 mt-auto pb-4" style={{ opacity: 0 }}>
             <a href="#diagnose" className="font-mono text-[13px] no-underline pb-3.5 inline-flex items-center gap-2.5 group transition-all"
               style={{ color: 'var(--fg)', borderBottom: '1px solid var(--fg)' }}>
               <span className="transition-transform group-hover:translate-x-1">↓</span>
@@ -109,8 +127,8 @@ export default function Hero() {
             background: 'linear-gradient(180deg, rgba(245,243,238,0.4), rgba(229,225,216,0.5))',
             minHeight: '380px',
           }}>
-          <div id="hero-canvas-meta" className="opacity-0 absolute top-4 left-4 font-mono text-[10px] flex items-center gap-2 z-10"
-            style={{ color: 'var(--fg-muted)', letterSpacing: '0.1em' }}>
+          <div id="hero-canvas-meta" className="absolute top-4 left-4 font-mono text-[10px] flex items-center gap-2 z-10"
+            style={{ color: 'var(--fg-muted)', letterSpacing: '0.1em', opacity: 0 }}>
             <span className="w-1.5 h-1.5 rounded-full" style={{
               background: '#D4571B', animation: 'pulse 2s ease-in-out infinite',
             }} />
@@ -121,8 +139,8 @@ export default function Hero() {
             <HeroDiagram active={active} />
           </div>
 
-          <div id="hero-canvas-legend" className="opacity-0 absolute bottom-4 left-4 flex gap-5 font-mono text-[10px]"
-            style={{ color: 'var(--fg-muted)', letterSpacing: '0.05em' }}>
+          <div id="hero-canvas-legend" className="absolute bottom-4 left-4 flex gap-5 font-mono text-[10px]"
+            style={{ color: 'var(--fg-muted)', letterSpacing: '0.05em', opacity: 0 }}>
             <Legend type="ink" label="station" />
             <Legend type="line" label="übergabe" />
             <Legend type="trace" label="unsichtbar" />
@@ -130,8 +148,8 @@ export default function Hero() {
         </div>
       </div>
 
-      <div id="hero-scroll" className="opacity-0 absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-5 pointer-events-none"
-        style={{ bottom: '80px', color: 'var(--fg-muted)' }}>
+      <div id="hero-scroll" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-5 pointer-events-none"
+        style={{ bottom: '80px', color: 'var(--fg-muted)', opacity: 0 }}>
         <span className="font-mono text-[10px]" style={{ letterSpacing: '0.18em' }}>scroll</span>
         <span className="block w-px h-8 relative overflow-hidden" style={{ background: 'currentColor' }}>
           <span className="absolute left-0 w-full h-1/2"

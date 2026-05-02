@@ -6,14 +6,11 @@ import { bgModes } from '../lib/tokens';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Globaler Hintergrund-Layer hinter der ganzen Site.
- * Jede Sektion mit data-bg="light|vignette|abyss" triggert beim Scrollen
- * einen smoothen Übergang der CSS-Variablen --bg-center, --bg-edge, --fg etc.
- *
- * Die Vignette entsteht aus dem radial-gradient zwischen --bg-center (Mitte)
- * und --bg-edge (Rand). Bei "light" sind beide gleich → flache Fläche.
- * Bei "vignette" ist die Mitte sehr dunkel, die Ränder warm-rauchig.
- * Bei "abyss" sind beide gleich-schwarz → uniform tief.
+ * Global background layer behind the entire site.
+ * Only animates the background gradient — text colors (--fg, --fg-muted)
+ * are controlled by each section via inline style overrides.
+ * This prevents the zero-contrast moment that occurs when --fg and
+ * the background color both sit at mid-values during a tween.
  */
 export default function BgStage() {
   const stageRef = useRef(null);
@@ -21,26 +18,19 @@ export default function BgStage() {
   useEffect(() => {
     const root = document.documentElement;
 
-    // Smooth tween der CSS-Variablen
     const tweenTo = (mode) => {
       const m = bgModes[mode] || bgModes.light;
       gsap.to(root, {
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power2.out',
         '--bg-center': m.center,
         '--bg-edge': m.edge,
-        '--fg': m.fg,
-        '--fg-muted': m.fgMuted,
-        '--line': m.line,
-        '--line-strong': m.lineStrong,
         overwrite: 'auto',
       });
     };
 
-    // Initialer Mode
     tweenTo('light');
 
-    // ScrollTrigger pro Sektion
     const sections = document.querySelectorAll('[data-bg]');
     const triggers = [];
 

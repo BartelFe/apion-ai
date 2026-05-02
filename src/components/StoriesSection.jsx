@@ -54,7 +54,7 @@ export default function StoriesSection() {
       if (headerLines?.length) {
         gsap.fromTo(
           headerLines,
-          { yPercent: 110 },
+          { y: 0, yPercent: 110 },
           {
             yPercent: 0,
             duration: 1.1,
@@ -73,7 +73,7 @@ export default function StoriesSection() {
 
         gsap.fromTo(
           headline,
-          { yPercent: 110 },
+          { y: 0, yPercent: 110 },
           {
             yPercent: 0,
             duration: 1.0,
