@@ -122,7 +122,11 @@ export default function DiagnoseSection() {
       className="relative"
       style={{ height: '400vh' }}
     >
-      <div ref={stickyRef} className="relative h-screen w-full overflow-hidden">
+      <div
+        ref={stickyRef}
+        className="relative h-screen w-full overflow-hidden"
+        style={{ '--fg': '#F5F3EE', '--fg-muted': '#8B847A', '--line': 'rgba(245, 243, 238, 0.14)', '--line-strong': 'rgba(245, 243, 238, 0.32)' }}
+      >
 
         {/* 3D-Hintergrund */}
         <div className="absolute inset-0">

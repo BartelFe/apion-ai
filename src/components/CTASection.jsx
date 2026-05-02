@@ -34,6 +34,13 @@ export default function CTASection() {
       ref={sectionRef}
       data-bg="vignette"
       className="relative px-5 md:px-10 pt-40 md:pt-56 pb-44 md:pb-56"
+      style={{
+        background: 'radial-gradient(ellipse 90% 70% at 50% 50%, #08070A 0%, #1A1408 100%)',
+        '--fg': '#F5F3EE',
+        '--fg-muted': '#8B847A',
+        '--line': 'rgba(245, 243, 238, 0.14)',
+        '--line-strong': 'rgba(245, 243, 238, 0.32)',
+      }}
     >
       <div className="max-w-4xl mx-auto text-center" ref={headlineRef}>
         <div className="mono-eyebrow inline-flex items-center gap-3" style={{ color: '#D4571B' }}>

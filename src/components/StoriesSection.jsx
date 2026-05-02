@@ -121,6 +121,13 @@ export default function StoriesSection() {
       ref={sectionRef}
       data-bg="vignette"
       className="relative px-5 md:px-10 pt-32 md:pt-40 pb-32 md:pb-40"
+      style={{
+        background: 'radial-gradient(ellipse 90% 70% at 50% 50%, #08070A 0%, #1A1408 100%)',
+        '--fg': '#F5F3EE',
+        '--fg-muted': '#8B847A',
+        '--line': 'rgba(245, 243, 238, 0.14)',
+        '--line-strong': 'rgba(245, 243, 238, 0.32)',
+      }}
     >
       <div className="max-w-5xl mx-auto">
         <div className="mb-24 md:mb-32 text-center" ref={headerRef}>
