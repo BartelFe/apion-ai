@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #F5F3EE;
+  --bg-center: #F5F3EE;
+  --bg-edge: #F5F3EE;
+  --fg: #0A0A0B;
+  --fg-muted: #6E6E70;
+  --line: rgba(10, 10, 11, 0.12);
+  --line-strong: rgba(10, 10, 11, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--fg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+body {
+  /* Platz für die fixed ConsoleBar am unteren Rand */
+  padding-bottom: 46px;
+}
+
+::selection { background: #D4571B; color: #F5F3EE; }
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* Reveal-utility for line-by-line text animations */
+.reveal-line { display: block; overflow: hidden; }
+.reveal-line > span {
+  display: inline-block;
+  transform: translateY(110%);
+  will-change: transform;
+}
+
+/* Typografie-Defaults für Editorial */
+.editorial-display {
+  font-family: 'Newsreader', 'Iowan Old Style', 'Charter', Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.editorial-display em { font-style: italic; font-weight: 400; }
+
+.mono-eyebrow {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--fg-muted);
+}
+
+/* Eckklammern als Frame-Utility */
+.bracket-frame { position: relative; }
+.bracket-frame::before,
+.bracket-frame::after,
+.bracket-frame > .bk-bl,
+.bracket-frame > .bk-br {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-color: currentColor;
+  border-style: solid;
+  border-width: 0;
+  pointer-events: none;
+}
+.bracket-frame::before { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+.bracket-frame::after { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+.bracket-frame > .bk-bl { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+.bracket-frame > .bk-br { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
