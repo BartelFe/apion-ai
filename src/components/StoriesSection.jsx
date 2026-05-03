@@ -46,73 +46,89 @@ const STORIES = [
 export default function StoriesSection() {
   const sectionRef = useRef(null);
   const headerRef = useRef(null);
-  const storyRefs = useRef([]);
+  const trackRef = useRef(null);
+  const cardRefs = useRef([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Header line reveal
       const headerLines = headerRef.current?.querySelectorAll('.reveal-line > span');
       if (headerLines?.length) {
-        gsap.fromTo(
-          headerLines,
-          { y: 0, yPercent: 110 },
-          {
-            yPercent: 0,
-            duration: 1.1,
-            stagger: 0.12,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: headerRef.current, start: 'top 65%', once: true },
-          }
-        );
+        gsap.fromTo(headerLines, { y: 0, yPercent: 110 }, {
+          yPercent: 0,
+          duration: 1.1,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: headerRef.current, start: 'top 65%', once: true },
+        });
       }
 
-      storyRefs.current.forEach((story) => {
-        if (!story) return;
-        const headline = story.querySelectorAll('.reveal-line > span');
-        const findings = story.querySelectorAll('[data-finding]');
-        const summary = story.querySelector('[data-summary]');
-
-        gsap.fromTo(
-          headline,
-          { y: 0, yPercent: 110 },
-          {
-            yPercent: 0,
-            duration: 1.0,
-            stagger: 0.1,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: story, start: 'top 70%', once: true },
-          }
-        );
-
-        gsap.fromTo(
-          findings,
-          { x: -30, opacity: 0 },
-          {
-            x: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.18,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: story, start: 'top 50%', once: true },
-          }
-        );
-
-        if (summary) {
-          gsap.fromTo(
-            summary,
-            { y: 20, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.9,
-              ease: 'power3.out',
-              scrollTrigger: { trigger: summary, start: 'top 80%', once: true },
-            }
-          );
-        }
+      // Scroll-hint fades in with header
+      gsap.fromTo('[data-stories-hint]', { opacity: 0, x: -8 }, {
+        opacity: 1, x: 0, duration: 0.7, ease: 'power2.out',
+        scrollTrigger: { trigger: headerRef.current, start: 'top 60%', once: true },
       });
     }, sectionRef);
 
-    return () => ctx.revert();
+    // IntersectionObserver for card entrance (works for horizontal visibility)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            gsap.to(entry.target, {
+              opacity: 1, x: 0, duration: 0.8, ease: 'power3.out',
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    cardRefs.current.forEach((card) => {
+      if (!card) return;
+      gsap.set(card, { opacity: 0, x: 32 });
+      observer.observe(card);
+    });
+
+    // Drag-to-scroll on desktop
+    const track = trackRef.current;
+    if (!track) {
+      return () => { ctx.revert(); observer.disconnect(); };
+    }
+
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    const onDown = (e) => {
+      isDown = true;
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+      track.style.userSelect = 'none';
+    };
+    const onLeave = () => { isDown = false; track.style.userSelect = ''; };
+    const onUp = () => { isDown = false; track.style.userSelect = ''; };
+    const onMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - track.offsetLeft;
+      track.scrollLeft = scrollLeft - (x - startX) * 1.4;
+    };
+
+    track.addEventListener('mousedown', onDown);
+    track.addEventListener('mouseleave', onLeave);
+    track.addEventListener('mouseup', onUp);
+    track.addEventListener('mousemove', onMove, { passive: false });
+
+    return () => {
+      ctx.revert();
+      observer.disconnect();
+      track.removeEventListener('mousedown', onDown);
+      track.removeEventListener('mouseleave', onLeave);
+      track.removeEventListener('mouseup', onUp);
+      track.removeEventListener('mousemove', onMove);
+    };
   }, []);
 
   return (
@@ -120,7 +136,6 @@ export default function StoriesSection() {
       id="stories"
       ref={sectionRef}
       data-bg="vignette"
-      className="relative px-5 md:px-10 pt-32 md:pt-40 pb-32 md:pb-40"
       style={{
         background: 'radial-gradient(ellipse 90% 70% at 50% 50%, #08070A 0%, #1A1408 100%)',
         '--fg': '#F5F3EE',
@@ -129,8 +144,9 @@ export default function StoriesSection() {
         '--line-strong': 'rgba(245, 243, 238, 0.32)',
       }}
     >
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-24 md:mb-32 text-center" ref={headerRef}>
+      {/* Section header */}
+      <div ref={headerRef} className="px-5 md:px-10 pt-32 md:pt-40 pb-12 md:pb-16">
+        <div className="max-w-5xl mx-auto">
           <div className="mono-eyebrow inline-flex items-center gap-3" style={{ color: 'var(--fg-muted)' }}>
             <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
             03 · drei geschichten
@@ -146,87 +162,111 @@ export default function StoriesSection() {
           >
             <span className="reveal-line"><span>Drei Betriebe.</span></span>
             <span className="reveal-line"><span>Drei <em>Übeltäter</em>.</span></span>
-            <span className="block" style={{ color: 'var(--fg-muted)' }}>Pseudonymisiert. Mathematisch realistisch.</span>
+            <span className="block mt-3" style={{ fontSize: 'clamp(15px, 1.6vw, 20px)', color: 'var(--fg-muted)', fontFamily: 'inherit', fontWeight: 300 }}>
+              Pseudonymisiert. Mathematisch realistisch.
+            </span>
           </h2>
+
+          {/* Scroll / drag hint */}
+          <div
+            data-stories-hint
+            className="mt-8 flex items-center gap-2 font-mono text-[11px]"
+            style={{ color: 'var(--fg-muted)', opacity: 0, letterSpacing: '0.1em' }}
+          >
+            <span>ziehen oder scrollen</span>
+            <span style={{ display: 'inline-block', animation: 'hintSlide 1.8s ease-in-out infinite' }}>→</span>
+          </div>
         </div>
+      </div>
 
-        <div className="space-y-32 md:space-y-40">
-          {STORIES.map((story, i) => (
-            <article
-              key={i}
-              ref={(el) => (storyRefs.current[i] = el)}
-              className="grid md:grid-cols-12 gap-8 md:gap-12"
+      {/* Horizontal scroll track */}
+      <div
+        ref={trackRef}
+        className="stories-track"
+        style={{
+          gap: '12px',
+          paddingLeft: '20px',
+          paddingRight: '20px',
+          paddingBottom: '72px',
+        }}
+      >
+        {STORIES.map((story, i) => (
+          <article
+            key={i}
+            ref={(el) => (cardRefs.current[i] = el)}
+            style={{
+              flex: '0 0 min(580px, calc(100vw - 52px))',
+              scrollSnapAlign: 'start',
+              background: 'rgba(245, 243, 238, 0.04)',
+              border: '0.5px solid var(--line-strong)',
+              borderRadius: '2px',
+              padding: '28px 28px 32px',
+            }}
+          >
+            {/* Card header */}
+            <div className="flex items-start justify-between mb-2">
+              <span className="font-mono text-[10px]" style={{ color: '#D4571B', letterSpacing: '0.15em' }}>
+                geschichte {String(i + 1).padStart(2, '0')}
+              </span>
+            </div>
+            <div className="font-mono text-[11px] mb-6" style={{ color: 'var(--fg-muted)', letterSpacing: '0.04em' }}>
+              {story.industry}
+            </div>
+
+            <h3
+              className="editorial-display mb-7"
+              style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', color: 'var(--fg)', lineHeight: 1.2 }}
             >
-              <div className="md:col-span-4">
-                <div className="font-mono text-[10px] mb-3" style={{ color: '#D4571B', letterSpacing: '0.15em' }}>
-                  geschichte {String(i + 1).padStart(2, '0')}
-                </div>
-                <div className="font-mono text-[12px] mb-6" style={{ color: 'var(--fg-muted)', letterSpacing: '0.04em' }}>
-                  {story.industry}
-                </div>
-                <h3
-                  className="editorial-display"
-                  style={{ fontSize: 'clamp(24px, 2.6vw, 36px)', color: 'var(--fg)' }}
-                >
-                  <span className="reveal-line"><span>{story.headline}</span></span>
-                </h3>
-              </div>
+              {story.headline}
+            </h3>
 
-              <div className="md:col-span-8 md:pl-8 md:border-l" style={{ borderColor: 'var(--line)' }}>
-                <ol className="space-y-5">
-                  {story.findings.map((f, idx) => (
-                    <li
-                      key={idx}
-                      data-finding
-                      className="grid grid-cols-[64px_1fr] gap-5 items-baseline"
-                    >
-                      <span
-                        className="font-mono text-[11px]"
-                        style={{
-                          color: f.trace ? '#D4571B' : 'var(--fg-muted)',
-                          letterSpacing: '0.05em',
-                        }}
-                      >
-                        {f.time}
-                      </span>
-                      <span
-                        className="font-mono"
-                        style={{
-                          fontSize: '14px',
-                          lineHeight: 1.55,
-                          color: f.trace ? 'var(--fg)' : 'var(--fg-muted)',
-                          opacity: f.trace ? 1 : 0.85,
-                        }}
-                      >
-                        {f.text}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+            <div className="mb-6 h-px" style={{ background: 'var(--line)' }} />
 
-                <div
-                  data-summary
-                  className="mt-10 pt-6 flex items-baseline gap-4"
-                  style={{ borderTop: '0.5px solid var(--line)' }}
-                >
-                  <span className="font-mono text-[10px]" style={{ color: 'var(--fg-muted)', letterSpacing: '0.12em' }}>
-                    Σ
+            {/* Findings timeline */}
+            <ol className="space-y-4">
+              {story.findings.map((f, idx) => (
+                <li key={idx} className="grid items-baseline" style={{ gridTemplateColumns: '52px 1fr', gap: '16px' }}>
+                  <span
+                    className="font-mono text-[11px]"
+                    style={{ color: f.trace ? '#D4571B' : 'var(--fg-muted)', letterSpacing: '0.05em' }}
+                  >
+                    {f.time}
                   </span>
                   <span
                     className="font-mono"
-                    style={{
-                      fontSize: '15px',
-                      color: '#D4571B',
-                    }}
+                    style={{ fontSize: '13px', lineHeight: 1.55, color: f.trace ? 'var(--fg)' : 'var(--fg-muted)' }}
                   >
-                    {story.summary}
+                    {f.text}
                   </span>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+                </li>
+              ))}
+            </ol>
+
+            {/* Summary */}
+            <div
+              className="mt-8 pt-5 flex items-baseline gap-3"
+              style={{ borderTop: '0.5px solid var(--line)' }}
+            >
+              <span className="font-mono text-[10px]" style={{ color: 'var(--fg-muted)', letterSpacing: '0.12em' }}>
+                Σ
+              </span>
+              <span className="font-mono" style={{ fontSize: '14px', color: '#D4571B' }}>
+                {story.summary}
+              </span>
+            </div>
+          </article>
+        ))}
+
+        {/* Trailing spacer so last card doesn't hug edge */}
+        <div style={{ flex: '0 0 20px' }} aria-hidden="true" />
       </div>
+
+      <style>{`
+        @keyframes hintSlide {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(6px); }
+        }
+      `}</style>
     </section>
   );
 }

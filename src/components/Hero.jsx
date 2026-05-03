@@ -15,15 +15,12 @@ export default function Hero() {
       if (cancelled) return;
 
       ctx = gsap.context(() => {
-        // Set initial states explicitly before animating
         gsap.set('#hero-eyebrow', { opacity: 0 });
         gsap.set('#hero-data', { opacity: 0 });
         gsap.set('#hero-cta', { opacity: 0 });
         gsap.set(['#hero-canvas-meta', '#hero-canvas-legend'], { opacity: 0 });
         gsap.set('#hero-scroll', { opacity: 0 });
-        // y:0 explicitly clears the pixel-y value GSAP reads from the CSS
-        // translateY(110%) — without it, yPercent stacks on top and stays
-        // clamped even after animation finishes.
+        // y:0 clears the pixel-y GSAP reads from CSS translateY(110%)
         gsap.set('#hero-headline .reveal-line > span', { y: 0, yPercent: 110 });
 
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -35,7 +32,7 @@ export default function Hero() {
           0.45,
         );
         tl.to(['#hero-canvas-meta', '#hero-canvas-legend'], { opacity: 1, duration: 0.7, stagger: 0.1 }, 1.1);
-        tl.to('#hero-data', { opacity: 1, y: 0, duration: 0.8 }, 1.6);
+        tl.to('#hero-data', { opacity: 1, duration: 0.8 }, 1.6);
         tl.to('#hero-cta', { opacity: 1, duration: 0.7 }, 1.9);
         tl.to('#hero-scroll', { opacity: 1, duration: 0.6 }, 2.3);
 
@@ -67,21 +64,21 @@ export default function Hero() {
       id="hero"
       ref={containerRef}
       data-bg="light"
-      className="relative min-h-screen px-5 md:px-10 pt-28 md:pt-32 pb-20"
+      className="relative min-h-screen px-5 md:px-10 pt-20 md:pt-32 pb-20"
     >
       <div className="bracket-frame absolute" style={{
-        top: '110px', left: '24px', right: '24px', bottom: '60px',
+        top: '80px', left: '24px', right: '24px', bottom: '60px',
         color: 'var(--fg)',
         pointerEvents: 'none',
       }}>
         <span className="bk-bl" /><span className="bk-br" />
       </div>
 
-      <div className="relative grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-14 z-10"
-        style={{ height: 'calc(100vh - 220px)', minHeight: '540px' }}>
+      {/* hero-grid-height applies calc(100vh-220px) only on md+ */}
+      <div className="relative grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-14 z-10 hero-grid-height">
 
-        {/* Linke Spalte */}
-        <div className="md:col-span-5 flex flex-col justify-between pt-6 md:pt-8 pl-4 md:pl-8">
+        {/* Left column — on mobile: stacks naturally so CTA is in viewport */}
+        <div className="md:col-span-5 flex flex-col md:justify-between pt-4 md:pt-8 pl-2 md:pl-8">
           <div>
             <div id="hero-eyebrow" className="mono-eyebrow flex items-center gap-3"
               style={{ color: 'var(--fg-muted)', opacity: 0 }}>
@@ -90,8 +87,8 @@ export default function Hero() {
             </div>
 
             <h1 id="hero-headline"
-              className="editorial-display mt-7 md:mt-8"
-              style={{ fontSize: 'clamp(36px, 4.8vw, 64px)' }}>
+              className="editorial-display mt-5 md:mt-8"
+              style={{ fontSize: 'clamp(32px, 4.2vw, 62px)' }}>
               <span className="reveal-line"><span>Jeder Mittelstandsbetrieb</span></span>
               <span className="reveal-line"><span>hat zwei Betriebe.</span></span>
               <span className="reveal-line">
@@ -102,13 +99,14 @@ export default function Hero() {
               </span>
             </h1>
 
-            <div id="hero-data" className="mt-10 flex items-end gap-8" style={{ opacity: 0 }}>
+            <div id="hero-data" className="mt-6 md:mt-10 flex items-end gap-8" style={{ opacity: 0 }}>
               <DataBlock label="Sichtbare Verbindungen" value={counters.visible} unit="aktiv" />
               <DataBlock label="Unsichtbare Übergaben" value={counters.hidden} unit="erkannt" trace />
             </div>
           </div>
 
-          <div id="hero-cta" className="flex items-center gap-6 mt-auto pb-4" style={{ opacity: 0 }}>
+          {/* CTA: mt-6 on mobile (natural flow), md:mt-auto pushes it down on desktop */}
+          <div id="hero-cta" className="flex items-center gap-6 mt-6 md:mt-auto pb-4" style={{ opacity: 0 }}>
             <a href="#diagnose" className="font-mono text-[13px] no-underline pb-3.5 inline-flex items-center gap-2.5 group transition-all"
               style={{ color: 'var(--fg)', borderBottom: '1px solid var(--fg)' }}>
               <span className="transition-transform group-hover:translate-x-1">↓</span>
@@ -120,12 +118,11 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Rechte Spalte: 3D Canvas */}
-        <div className="md:col-span-7 relative w-full h-full"
+        {/* Canvas column — hero-canvas class controls height responsively */}
+        <div className="md:col-span-7 hero-canvas relative"
           style={{
             border: '0.5px solid var(--line)',
             background: 'linear-gradient(180deg, rgba(245,243,238,0.4), rgba(229,225,216,0.5))',
-            minHeight: '380px',
           }}>
           <div id="hero-canvas-meta" className="absolute top-4 left-4 font-mono text-[10px] flex items-center gap-2 z-10"
             style={{ color: 'var(--fg-muted)', letterSpacing: '0.1em', opacity: 0 }}>
@@ -135,7 +132,7 @@ export default function Hero() {
             <span>betrieb #demo · 09:00 → 17:00 · 32 stationen</span>
           </div>
 
-          <div className="w-full h-full">
+          <div className="w-full h-full" style={{ minHeight: 'inherit' }}>
             <HeroDiagram active={active} />
           </div>
 
@@ -185,7 +182,7 @@ function DataBlock({ label, value, unit, trace = false }) {
       </span>
       <span className="editorial-display flex items-baseline gap-1.5"
         style={{
-          fontSize: '38px',
+          fontSize: 'clamp(28px, 3vw, 38px)',
           color: trace ? '#D4571B' : 'var(--fg)',
         }}>
         {value}

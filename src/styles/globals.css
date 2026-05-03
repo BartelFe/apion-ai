@@ -28,7 +28,6 @@ html, body {
 }
 
 body {
-  /* Platz für die fixed ConsoleBar am unteren Rand */
   padding-bottom: 46px;
 }
 
@@ -81,6 +80,56 @@ html.lenis, html.lenis body { height: auto; }
 .bracket-frame::after { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
 .bracket-frame > .bk-bl { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
 .bracket-frame > .bk-br { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* Hero grid: fixed height only on desktop so CTA is always in-viewport on mobile */
+.hero-grid-height {
+  min-height: 420px;
+}
+@media (min-width: 768px) {
+  .hero-grid-height {
+    height: calc(100vh - 220px);
+    min-height: 540px;
+  }
+}
+
+/* Hero canvas: smaller on mobile, full-height on desktop */
+.hero-canvas {
+  min-height: 220px;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .hero-canvas {
+    height: 100%;
+    min-height: 380px;
+  }
+}
+
+/* Stories horizontal scroll track */
+.stories-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  user-select: none;
+}
+.stories-track:active { cursor: grabbing; }
+.stories-track::-webkit-scrollbar { display: none; }
+
+/* Founder photo: portrait crop, responsive height */
+.founder-photo-wrap {
+  height: 280px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+@media (min-width: 768px) {
+  .founder-photo-wrap {
+    height: auto;
+    min-height: 400px;
+  }
+}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {

@@ -152,7 +152,7 @@ export default function DiagnoseSection() {
         </div>
 
         {/* Phasen-Texte (oben links) */}
-        <div className="absolute top-24 md:top-32 left-10 md:left-20 max-w-md md:max-w-lg z-20 pointer-events-none">
+        <div className="absolute top-20 md:top-28 left-6 md:left-16 z-20 pointer-events-none" style={{ maxWidth: 'min(380px, 44vw)' }}>
           {PHASES.map((phase, i) => (
             <div
               key={i}
@@ -166,7 +166,7 @@ export default function DiagnoseSection() {
               <h2
                 className="editorial-display mt-5 whitespace-pre-line"
                 style={{
-                  fontSize: 'clamp(28px, 3.4vw, 46px)',
+                  fontSize: 'clamp(18px, 2.2vw, 30px)',
                   color: 'var(--fg)',
                 }}
               >
