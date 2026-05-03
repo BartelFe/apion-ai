@@ -73,17 +73,21 @@ function HeroDesktop() {
           in die 3D-Welt greifen darf.
         */}
 
-        {/* RECHTE SPALTE: 3D-Szene + HUDs (50vw bis Viewport-Rechts, 3vw Luft zum Rand) */}
+        {/* MITTE: 3D-Szene — zwischen Headline (links) und DataHUD (rechts) */}
         <div
           className="absolute top-0 bottom-0"
-          style={{ right: '3vw', width: '50vw' }}
+          style={{ left: '48vw', right: '21vw' }}
         >
-          {/* Canvas füllt den Container — wird damit auf 50vw beschränkt */}
           <div className="absolute inset-0">
             <HeroScene ref={sceneRef} />
           </div>
+        </div>
 
-          {/* HUD oben rechts + AuftragsTag unten rechts — relativ zur rechten Spalte */}
+        {/* RECHTS: DataHUD-Spalte — eigene Zone, kein Overlap mit Canvas */}
+        <div
+          className="absolute right-0 top-0 bottom-0"
+          style={{ width: '21vw' }}
+        >
           <DataHUD ref={hudRef} />
         </div>
 

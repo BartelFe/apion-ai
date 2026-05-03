@@ -19,7 +19,9 @@ function SceneInner({ worldRef, cameraSetterRef }) {
     const distFactor = aspect >= 1.0 ? 1.0
                      : aspect >= 0.85 ? 1.10
                      : aspect >= 0.70 ? 1.22
-                     : 1.36;
+                     : aspect >= 0.55 ? 1.40
+                     : aspect >= 0.42 ? 1.60
+                     : 1.80;
     const baseX = 11, baseY = 13, baseZ = 19;
     camera.position.set(baseX * distFactor, baseY * distFactor, baseZ * distFactor);
     camera.fov = 34;
