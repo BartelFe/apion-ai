@@ -6,15 +6,27 @@ import * as THREE from 'three';
 import World from './scene/World';
 
 // Innerer Wrapper damit wir useThree() für Camera/Scene haben.
+// Kamera-Distanz skaliert mit Aspect-Ratio, damit alle 7 Stationen
+// inklusive Tool-Sticker auf jedem Desktop-Aspect garantiert sichtbar
+// bleiben (rechte Spalte ist 50vw → variiert von ~0.5 bis 1.2 aspect).
 function SceneInner({ worldRef, cameraSetterRef }) {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
 
   useEffect(() => {
-    // Iso-mäßige Startposition.
-    camera.position.set(14, 12, 18);
+    const aspect = size.width / size.height;
+    // Distance-Faktor: bei portrait (schmal) Kamera weiter weg, bei landscape näher.
+    // Iso-Richtung bleibt: Komponenten x/y/z im konstanten Verhältnis.
+    const distFactor = aspect >= 1.0 ? 1.0
+                     : aspect >= 0.85 ? 1.10
+                     : aspect >= 0.70 ? 1.22
+                     : 1.36;
+    const baseX = 11, baseY = 13, baseZ = 19;
+    camera.position.set(baseX * distFactor, baseY * distFactor, baseZ * distFactor);
+    camera.fov = 34;
     camera.lookAt(0, 0.5, 0);
+    camera.updateProjectionMatrix();
     if (cameraSetterRef) cameraSetterRef.current = camera;
-  }, [camera, cameraSetterRef]);
+  }, [camera, cameraSetterRef, size.width, size.height]);
 
   return (
     <>

@@ -43,21 +43,35 @@ const Headline = forwardRef(function Headline(_, ref) {
   return (
     <div
       ref={rootRef}
-      className="absolute z-20 left-5 top-20 md:left-10 md:top-28 max-w-[44%] pointer-events-none"
+      className="absolute z-20 left-10 top-28 pointer-events-none"
+      // Hartes Limit: H1 darf nie in die rechte Spalte (3D-Welt) bluten.
+      // 24px Buffer zur Spalten-Grenze.
+      style={{ maxWidth: 'calc(50vw - 64px)' }}
     >
       <div className="mono-eyebrow mb-6" style={{ color: 'var(--fg-muted)' }}>
         00 · der unsichtbare betrieb
       </div>
       <h1
         className="editorial-display"
-        style={{ fontSize: 'clamp(28px, 4vw, 60px)', lineHeight: 1.05 }}
+        style={{
+          fontSize: 'clamp(28px, 3.6vw, 56px)',
+          lineHeight: 1.05,
+          // Container respektiert maxWidth, aber overflow:visible erlaubt
+          // dem Bleed-Wort die Spalten-Grenze zu überschreiten.
+          overflow: 'visible',
+        }}
       >
         <span className="reveal-line"><span>Jeder Mittelstandsbetrieb</span></span>
         <span className="reveal-line"><span>hat zwei Betriebe.</span></span>
         <span className="reveal-line">
           <span style={{ color: 'var(--fg-muted)', fontStyle: 'italic' }}>Den sichtbaren —</span>
         </span>
-        <span className="reveal-line">
+        {/*
+          Bleed-Zeile: white-space: nowrap (via .reveal-line--bleed > span),
+          damit "auffrisst" auf derselben Zeile bleibt und horizontal
+          aus der linken Spalte herauswächst — synchron zum Bloom in Akt 2.
+        */}
+        <span className="reveal-line reveal-line--bleed">
           <span>
             und den, der ihn{' '}
             <em ref={auffrisstRef} style={{ fontStyle: 'italic' }}>auffrisst</em>.

@@ -4,12 +4,15 @@
 //
 // Branche: Technische Gebäudeausrüstung (TGA) — Validierungspflichtig mit Kunde.
 
+// Stationen sind enger geclustert (≈25% kompakter auf x), damit sie in der
+// rechten 50vw-Spalte vollständig sichtbar bleiben — inklusive Tool-Sticker.
+// Tool-Sticker-Größe wurde NICHT verändert (Lesbarkeit ist Pflicht).
 export const STATIONS = [
   {
     id: 'anfrage',
     label: 'Anfrage',
     sub: 'Bauträger · Architekten',
-    pos: [-7.5, 0, -4.5],
+    pos: [-6.0, 0, -4.5],
     size: [1.6, 0.9, 1.1],
     tools: ['Outlook', 'Telefon', 'Webformular'],
     color: 'paper',
@@ -18,7 +21,7 @@ export const STATIONS = [
     id: 'aufmass',
     label: 'Aufmaß',
     sub: 'Vor-Ort-Erfassung',
-    pos: [-2.5, 0, -5.5],
+    pos: [-2.2, 0, -5.5],
     size: [1.2, 0.7, 1.2],
     tools: ['Klemmbrett', 'mh-software', 'Stift+Papier'],
     color: 'paper',
@@ -27,7 +30,7 @@ export const STATIONS = [
     id: 'kalkulation',
     label: 'Kalkulation',
     sub: 'Angebotserstellung',
-    pos: [3.0, 0, -4.5],
+    pos: [2.6, 0, -4.5],
     size: [1.6, 1.1, 1.1],
     tools: ['Streit V.1', 'Excel', 'LINEAR'],
     color: 'paper',
@@ -46,7 +49,7 @@ export const STATIONS = [
     id: 'lager',
     label: 'Lager / Großhandel',
     sub: 'Material',
-    pos: [-6.5, 0, 4.0],
+    pos: [-5.0, 0, 4.0],
     size: [2.2, 0.8, 1.6],
     tools: ['GC-Gruppe', 'Richter+Frenzel', 'IDS-Connect'],
     color: 'paper',
@@ -55,7 +58,7 @@ export const STATIONS = [
     id: 'baustelle',
     label: 'Baustelle',
     sub: 'Ausführung',
-    pos: [4.5, 0, 4.5],
+    pos: [3.4, 0, 4.5],
     size: [1.8, 0.9, 1.4],
     tools: ['WhatsApp', 'Streit Mobile', 'Foto'],
     color: 'paper',
@@ -64,7 +67,7 @@ export const STATIONS = [
     id: 'abrechnung',
     label: 'Abrechnung',
     sub: 'Abschluss',
-    pos: [8.5, 0, 1.0],
+    pos: [6.5, 0, 1.2],
     size: [1.4, 1.0, 1.0],
     tools: ['DATEV', 'Lexware', 'Excel'],
     color: 'paper',

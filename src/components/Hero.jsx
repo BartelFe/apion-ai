@@ -10,13 +10,14 @@ import { createHeroChoreography } from './Hero/ScrollChoreography';
 // Mobile (<768px): 2D-SVG-Fallback mit IntersectionObserver-Akten.
 
 export default function Hero() {
+  // Desktop-Layout (50/50-Grid mit echter 3D-Welt) erst ab 1024px.
+  // Darunter: 2D-SVG-Fallback mit Stack-Layout.
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' && window.innerWidth < 768
+    typeof window !== 'undefined' && window.innerWidth < 1024
   );
 
-  // Mobile-Detection inkl. Resize.
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -62,12 +63,31 @@ function HeroDesktop() {
           background: 'linear-gradient(180deg, var(--bg-base) 0%, rgba(245,243,238,0.95) 100%)',
         }}
       >
-        {/* 3D-Szene Vollbild im Hintergrund */}
-        <div className="absolute inset-0">
-          <HeroScene ref={sceneRef} />
+        {/*
+          GRID-LAYOUT (Desktop ≥1024px):
+          ─ Linke Spalte (0 → 50vw - 24px Padding): Headline + Section-Label + Bottom-Indikator
+          ─ Rechte Spalte (50vw → 100vw):           3D-Szene + DataHUD + AuftragsTag
+
+          Beide Spalten sind absolute Boxen, damit der Sketch-Frame und Vignette
+          full-bleed bleiben können — und damit "auffrisst" über die Spalten-Grenze
+          in die 3D-Welt greifen darf.
+        */}
+
+        {/* RECHTE SPALTE: 3D-Szene + HUDs (50vw bis Viewport-Rechts) */}
+        <div
+          className="absolute right-0 top-0 bottom-0"
+          style={{ width: '50vw' }}
+        >
+          {/* Canvas füllt den Container — wird damit auf 50vw beschränkt */}
+          <div className="absolute inset-0">
+            <HeroScene ref={sceneRef} />
+          </div>
+
+          {/* HUD oben rechts + AuftragsTag unten rechts — relativ zur rechten Spalte */}
+          <DataHUD ref={hudRef} />
         </div>
 
-        {/* Sketch-Vignette für Editorial-Look */}
+        {/* Sketch-Vignette — full-bleed, Atmosphäre über beiden Spalten */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -76,7 +96,7 @@ function HeroDesktop() {
           }}
         />
 
-        {/* Bracket-Frame */}
+        {/* Bracket-Frame full-bleed */}
         <div
           className="bracket-frame absolute pointer-events-none"
           style={{
@@ -87,21 +107,23 @@ function HeroDesktop() {
           <span className="bk-bl" /><span className="bk-br" />
         </div>
 
-        {/* Headline left */}
-        <Headline ref={headlineRef} />
-
-        {/* HUD right */}
-        <DataHUD ref={hudRef} />
-
-        {/* Akt-Indicator */}
+        {/* LINKE SPALTE: Headline + Section-Label + Bottom-Indikator (0 → 50vw) */}
         <div
-          className="absolute z-20 left-5 bottom-12 md:left-10 md:bottom-16 font-mono text-[10px] pointer-events-none"
-          style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
+          className="absolute left-0 top-0 bottom-0 pointer-events-none"
+          style={{ width: '50vw' }}
         >
-          scroll · vier akte · 09:14 → 17:00
+          <Headline ref={headlineRef} />
+
+          {/* Akt-Indicator unten links innerhalb der linken Spalte */}
+          <div
+            className="absolute z-20 left-10 bottom-16 font-mono text-[10px]"
+            style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
+          >
+            scroll · vier akte · 09:14 → 17:00
+          </div>
         </div>
 
-        {/* Scroll-Hint */}
+        {/* Scroll-Hint mittig zwischen den Spalten */}
         <div
           className="absolute z-20 left-1/2 bottom-8 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
           style={{ color: 'var(--fg-muted)' }}

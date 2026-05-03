@@ -46,6 +46,13 @@ html.lenis, html.lenis body { height: auto; }
   will-change: transform;
 }
 
+/* "Bleed"-Variante: y-Clipping bleibt für die Reveal-Anim, aber die
+   Zeile darf horizontal über die Container-Grenze hinaus wachsen.
+   Wird im Hero genutzt, damit das Wort "auffrisst" optisch in die
+   3D-Szene rechts greifen kann. */
+.reveal-line--bleed { overflow-x: visible; overflow-y: clip; }
+.reveal-line--bleed > span { white-space: nowrap; }
+
 /* Typografie-Defaults für Editorial */
 .editorial-display {
   font-family: 'Newsreader', 'Iowan Old Style', 'Charter', Georgia, serif;
