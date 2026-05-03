@@ -73,10 +73,10 @@ function HeroDesktop() {
           in die 3D-Welt greifen darf.
         */}
 
-        {/* RECHTE SPALTE: 3D-Szene + HUDs (50vw bis Viewport-Rechts) */}
+        {/* RECHTE SPALTE: 3D-Szene + HUDs (50vw bis Viewport-Rechts, 3vw Luft zum Rand) */}
         <div
-          className="absolute right-0 top-0 bottom-0"
-          style={{ width: '50vw' }}
+          className="absolute top-0 bottom-0"
+          style={{ right: '3vw', width: '50vw' }}
         >
           {/* Canvas füllt den Container — wird damit auf 50vw beschränkt */}
           <div className="absolute inset-0">
