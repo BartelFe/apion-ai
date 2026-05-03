@@ -131,6 +131,34 @@ html.lenis, html.lenis body { height: auto; }
   }
 }
 
+/* DiagnoseSection split layout */
+.diagnose-canvas-panel {
+  height: 42%;
+  flex: 0 0 42%;
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .diagnose-canvas-panel {
+    height: 100%;
+    flex: 1 1 0%;
+  }
+}
+.diagnose-text-panel {
+  flex: 1 1 0%;
+  background: #06060A;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .diagnose-text-panel {
+    flex: 0 0 42%;
+    width: 42%;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

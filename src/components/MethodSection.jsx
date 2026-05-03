@@ -102,8 +102,7 @@ export default function MethodSection() {
       style={{ '--fg': '#0A0A0B', '--fg-muted': '#6E6E70', '--line': 'rgba(10,10,11,0.12)', '--line-strong': 'rgba(10,10,11,0.35)' }}
     >
       <div className="max-w-6xl mx-auto" ref={headlineRef}>
-        <div className="mono-eyebrow flex items-center gap-3" style={{ color: 'var(--fg-muted)' }}>
-          <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
+        <div className="mono-eyebrow" style={{ color: 'var(--fg-muted)' }}>
           04 · vorgehen
         </div>
         <h2

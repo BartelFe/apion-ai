@@ -15,7 +15,6 @@ export default function Hero() {
       if (cancelled) return;
 
       ctx = gsap.context(() => {
-        gsap.set('#hero-eyebrow', { opacity: 0 });
         gsap.set('#hero-data', { opacity: 0 });
         gsap.set('#hero-cta', { opacity: 0 });
         gsap.set(['#hero-canvas-meta', '#hero-canvas-legend'], { opacity: 0 });
@@ -25,7 +24,6 @@ export default function Hero() {
 
         const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-        tl.to('#hero-eyebrow', { opacity: 1, duration: 0.6 }, 0.2);
         tl.to(
           '#hero-headline .reveal-line > span',
           { yPercent: 0, duration: 1.2, stagger: 0.14 },
@@ -80,12 +78,6 @@ export default function Hero() {
         {/* Left column — on mobile: stacks naturally so CTA is in viewport */}
         <div className="md:col-span-5 flex flex-col md:justify-between pt-4 md:pt-8 pl-2 md:pl-8">
           <div>
-            <div id="hero-eyebrow" className="mono-eyebrow flex items-center gap-3"
-              style={{ color: 'var(--fg-muted)', opacity: 0 }}>
-              <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
-              apion · prozessautomatisierung für den mittelstand
-            </div>
-
             <h1 id="hero-headline"
               className="editorial-display mt-5 md:mt-8"
               style={{ fontSize: 'clamp(32px, 4.2vw, 62px)' }}>

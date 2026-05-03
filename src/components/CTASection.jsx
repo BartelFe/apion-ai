@@ -43,10 +43,8 @@ export default function CTASection() {
       }}
     >
       <div className="max-w-4xl mx-auto text-center" ref={headlineRef}>
-        <div className="mono-eyebrow inline-flex items-center gap-3" style={{ color: '#D4571B' }}>
-          <span className="inline-block w-6 h-px" style={{ background: '#D4571B' }} />
+        <div className="mono-eyebrow" style={{ color: '#D4571B' }}>
           07 · sichtbar machen
-          <span className="inline-block w-6 h-px" style={{ background: '#D4571B' }} />
         </div>
 
         <h2

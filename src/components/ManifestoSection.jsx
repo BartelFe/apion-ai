@@ -109,8 +109,7 @@ export default function ManifestoSection() {
       style={{ '--fg': '#0A0A0B', '--fg-muted': '#6E6E70', '--line': 'rgba(10,10,11,0.12)', '--line-strong': 'rgba(10,10,11,0.35)' }}
     >
       <div className="max-w-4xl mx-auto">
-        <div className="mb-20 mono-eyebrow flex items-center gap-3" style={{ color: 'var(--fg-muted)' }}>
-          <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
+        <div className="mb-20 mono-eyebrow" style={{ color: 'var(--fg-muted)' }}>
           05 · haltung
         </div>
 
@@ -178,7 +177,7 @@ export default function ManifestoSection() {
                       >
                         <div>
                           <div className="font-mono text-[12px]" style={{ color: '#F5F3EE', letterSpacing: '0.04em' }}>
-                            Felix Bartel
+                            Alex Grebe
                           </div>
                           <div className="font-mono text-[11px] mt-1" style={{ color: '#8B847A', letterSpacing: '0.08em' }}>
                             Gründer · APION

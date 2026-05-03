@@ -147,10 +147,8 @@ export default function StoriesSection() {
       {/* Section header */}
       <div ref={headerRef} className="px-5 md:px-10 pt-32 md:pt-40 pb-12 md:pb-16">
         <div className="max-w-5xl mx-auto">
-          <div className="mono-eyebrow inline-flex items-center gap-3" style={{ color: 'var(--fg-muted)' }}>
-            <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
+          <div className="mono-eyebrow" style={{ color: 'var(--fg-muted)' }}>
             03 · drei geschichten
-            <span className="inline-block w-6 h-px" style={{ background: 'var(--fg-muted)' }} />
           </div>
           <h2
             className="editorial-display mt-7 mx-auto"
