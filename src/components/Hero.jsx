@@ -95,20 +95,23 @@ function HeroDesktop() {
           in die 3D-Welt greifen darf.
         */}
 
-        {/* MITTE: 3D-Szene — zwischen Headline (links) und DataHUD (rechts).
-            HUD-Breite via clamp damit AuftragsTag (max-w-260px) nie ins
-            Canvas-Areal überläuft (1024–1280px) und auf großen Screens
-            nicht zu fett wird. */}
+        {/* MITTE: 3D-Szene — sitzt zwischen Headline und DataHUD, darf
+            beide Seiten leicht überlappen damit das Canvas Atemraum hat
+            und die Stationen nicht clippen. Headline-Spalte ist
+            pointer-events-none, HUD-Inhalte halten sich rechts/Mitte ihrer
+            Spalte → optisches Overlap, kein Click-Konflikt. */}
         <div
           className="absolute top-0 bottom-0"
-          style={{ left: '48vw', right: 'clamp(240px, 21vw, 380px)' }}
+          style={{ left: '44vw', right: 'clamp(200px, 17vw, 320px)' }}
         >
           <div className="absolute inset-0">
             <HeroScene ref={sceneRef} />
           </div>
         </div>
 
-        {/* RECHTS: DataHUD-Spalte — eigene Zone, kein Overlap mit Canvas */}
+        {/* RECHTS: DataHUD-Spalte — eigene Zone, das Canvas darf optisch
+            in die linken ~50px dieser Spalte hineinragen (leerer
+            Canvas-Rand, keine 3D-Geometrie). */}
         <div
           className="absolute right-0 top-0 bottom-0"
           style={{ width: 'clamp(240px, 21vw, 380px)' }}
