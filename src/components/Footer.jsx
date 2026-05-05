@@ -1,6 +1,26 @@
+import { useEffect } from 'react';
 import Logo from './Logo';
 
+// TODO: Vor Launch echte Pages für Impressum/Datenschutz/AGB/Cookies
+// verlinken. Aktuell href="#" als Platzhalter — der Dev-Warn unten
+// erinnert daran, falls man es vergisst.
+const LEGAL_LINKS = [
+  ['Impressum', '#'],
+  ['Datenschutz', '#'],
+  ['AGB', '#'],
+  ['Cookies', '#'],
+];
+
 export default function Footer() {
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const impressum = LEGAL_LINKS.find(([label]) => label === 'Impressum');
+      if (impressum && impressum[1] === '#') {
+        console.warn('[Footer] TODO: Impressum href="#" — link to actual page before launch.');
+      }
+    }
+  }, []);
+
   return (
     <footer
       data-bg="light"
@@ -10,7 +30,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-10">
           <div className="col-span-2 md:col-span-4">
-            <a href="#" className="flex items-center gap-3 no-underline" style={{ color: 'var(--fg)' }}>
+            <a href="#hero" className="flex items-center gap-3 no-underline" style={{ color: 'var(--fg)' }}>
               <Logo size={32} />
               <span className="font-sans text-sm tracking-logo">APION</span>
             </a>
@@ -35,12 +55,7 @@ export default function Footer() {
             ]}/>
           </div>
           <div className="md:col-span-2">
-            <FooterCol title="Rechtliches" links={[
-              ['Impressum', '#'],
-              ['Datenschutz', '#'],
-              ['AGB', '#'],
-              ['Cookies', '#'],
-            ]}/>
+            <FooterCol title="Rechtliches" links={LEGAL_LINKS} />
           </div>
           <div className="md:col-span-2">
             <FooterCol title="Sprache" links={[

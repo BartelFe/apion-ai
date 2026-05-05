@@ -61,7 +61,7 @@ export default function CTASection() {
 
         <div ref={detailsRef} className="mt-14 flex flex-col items-center gap-8">
           <a
-            href="#"
+            href="mailto:hallo@apion-ai.com?subject=Erstgespr%C3%A4ch"
             className="inline-flex items-center gap-3 group"
             style={{
               color: 'var(--fg)',

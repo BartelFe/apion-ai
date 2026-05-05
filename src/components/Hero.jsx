@@ -10,14 +10,14 @@ import { createHeroChoreography } from './Hero/ScrollChoreography';
 // Mobile (<768px): 2D-SVG-Fallback mit IntersectionObserver-Akten.
 
 export default function Hero() {
-  // Desktop-Layout (50/50-Grid mit echter 3D-Welt) erst ab 1024px.
+  // Desktop-Layout (50/50-Grid mit echter 3D-Welt) ab 768px (Tailwind md:).
   // Darunter: 2D-SVG-Fallback mit Stack-Layout.
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' && window.innerWidth < 1024
+    typeof window !== 'undefined' && window.innerWidth < 768
   );
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 1024);
+    const onResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -34,6 +34,28 @@ function HeroDesktop() {
   const hudRef      = useRef(null);
 
   useEffect(() => {
+    // Reduced-Motion: 4-Akt-Scrub komplett überspringen, statt dessen
+    // einen ruhigen Final-State zeigen — keine Pin/Scrub-Trigger.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const w = sceneRef.current?.world();
+      if (w) {
+        w.setVisibleLayerOpacity(0.6);
+        w.setShadowProgress(1);
+        w.setShadowOpacity(0.85);
+        w.setShadowIntensity(0.7);
+        w.setNamedProgress(1);
+      }
+      const h = hudRef.current;
+      if (h) {
+        h.setVisible(124);
+        h.setUebergaben(47);
+        h.setStunden('15.6');
+        h.setEuro(33800);
+        h.setEinsparung(23660);
+      }
+      return;
+    }
+
     const tl = createHeroChoreography({
       section: sectionRef.current,
       sticky: stickyRef.current,
@@ -73,10 +95,13 @@ function HeroDesktop() {
           in die 3D-Welt greifen darf.
         */}
 
-        {/* MITTE: 3D-Szene — zwischen Headline (links) und DataHUD (rechts) */}
+        {/* MITTE: 3D-Szene — zwischen Headline (links) und DataHUD (rechts).
+            HUD-Breite via clamp damit AuftragsTag (max-w-260px) nie ins
+            Canvas-Areal überläuft (1024–1280px) und auf großen Screens
+            nicht zu fett wird. */}
         <div
           className="absolute top-0 bottom-0"
-          style={{ left: '48vw', right: '21vw' }}
+          style={{ left: '48vw', right: 'clamp(240px, 21vw, 380px)' }}
         >
           <div className="absolute inset-0">
             <HeroScene ref={sceneRef} />
@@ -86,7 +111,7 @@ function HeroDesktop() {
         {/* RECHTS: DataHUD-Spalte — eigene Zone, kein Overlap mit Canvas */}
         <div
           className="absolute right-0 top-0 bottom-0"
-          style={{ width: '21vw' }}
+          style={{ width: 'clamp(240px, 21vw, 380px)' }}
         >
           <DataHUD ref={hudRef} />
         </div>

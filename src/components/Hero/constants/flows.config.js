@@ -22,8 +22,11 @@ export const SHADOW_FLOWS = [
   { from: 'aufmass',     to: 'kalkulation', label: 'Klemmbrett → CAD manuell', kind: 'flow' },
   // Kalkulation → Disposition: Streit V.1 wird in Excel kopiert
   { from: 'kalkulation', to: 'disposition', label: 'Streit V.1 → Excel manuell', kind: 'split' },
-  // Disposition self-loop: Whiteboard pflegen, ständig
-  { from: 'disposition', to: 'disposition', label: 'Whiteboard-Sync', kind: 'loop' },
+  // Disposition self-loop: Whiteboard pflegen, ständig.
+  // Hinweis: kein label — eine Self-Loop hat keinen visuellen Rendering-Target
+  // (kein Endpunkt, an dem ein Text-Sprite haften könnte). Sobald in der Szene
+  // ein in-canvas <Text> für Loops gewünscht ist, hier wieder hinzufügen.
+  { from: 'disposition', to: 'disposition', kind: 'loop' },
   // Disposition → Lager: per Telefon, kein System
   { from: 'disposition', to: 'lager',       label: 'Material per Telefon', kind: 'flow' },
   // Lager → Baustelle: WhatsApp-Foto, manuelle Bestellung

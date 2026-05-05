@@ -5,6 +5,18 @@ const founderImg = '/founder.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// TODO VERIFY: Founder name spelling — confirm with apion-ai.com/team
+// or LinkedIn before going live. Misspelling = brand death.
+// Note: img alt vorher inkonsistent ("Felix Bartel" vs sichtbar "Alex Grebe").
+// FOUNDER_NAME wird jetzt in beiden Stellen genutzt — Single Source of Truth.
+const FOUNDER_NAME = 'Alex Grebe';
+const FOUNDER_TITLE = 'Gründer · APION';
+
+// NOTE: statements müssen plain strings sein — kein inline HTML (kein <em>,
+// <strong> etc.). Die Word-Split-Animation unten arbeitet auf
+// text.textContent.split(' ') + innerHTML-Replacement; HTML-Markup wird dabei
+// gestrippt. Wenn künftig Inline-Markup gebraucht wird, auf eine echte
+// SplitText-Implementierung (DOM-Walker) umstellen.
 const STATEMENTS = [
   {
     eyebrow: '01',
@@ -28,6 +40,18 @@ export default function ManifestoSection() {
   const stmtRefs = useRef([]);
 
   useEffect(() => {
+    // Reduced-Motion: alle initial-versteckten Elemente direkt sichtbar
+    // schalten, ScrollTrigger gar nicht erst erzeugen.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const root = sectionRef.current;
+      if (!root) return;
+      root.querySelectorAll('[data-stmt-eyebrow], [data-stmt-photo], [data-stmt-attribution]')
+        .forEach((el) => { el.style.opacity = '1'; el.style.transform = 'none'; });
+      root.querySelectorAll('[data-stmt-line]')
+        .forEach((el) => { el.style.transform = 'scaleX(1)'; });
+      return;
+    }
+
     const ctx = gsap.context(() => {
       stmtRefs.current.forEach((stmt) => {
         if (!stmt) return;
@@ -138,7 +162,7 @@ export default function ManifestoSection() {
                     >
                       <img
                         src={founderImg}
-                        alt="Felix Bartel, Gründer APION"
+                        alt={`${FOUNDER_NAME}, ${FOUNDER_TITLE}`}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -177,10 +201,10 @@ export default function ManifestoSection() {
                       >
                         <div>
                           <div className="font-mono text-[12px]" style={{ color: '#F5F3EE', letterSpacing: '0.04em' }}>
-                            Alex Grebe
+                            {FOUNDER_NAME}
                           </div>
                           <div className="font-mono text-[11px] mt-1" style={{ color: '#8B847A', letterSpacing: '0.08em' }}>
-                            Gründer · APION
+                            {FOUNDER_TITLE}
                           </div>
                         </div>
                       </div>

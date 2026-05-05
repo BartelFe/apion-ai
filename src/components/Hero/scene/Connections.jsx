@@ -1,5 +1,6 @@
 import { useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Select } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { c3 } from '../../../lib/tokens';
 import { stationById } from '../constants/stations.config';
@@ -185,18 +186,20 @@ const Connections = forwardRef(function Connections(_, ref) {
         ))}
       </group>
 
-      {/* Shadow layer: orange gestrichelt, animiert */}
-      <group ref={shadowGroupRef} layers={1}>
-        {shadowPaths.map((p, i) => (
-          <line
-            key={`s${i}`}
-            geometry={p.geo}
-            material={shadowMaterials[i]}
-            // Layer 1 — wird vom Bloom-Pass selektiert
-            ref={(el) => { if (el) el.layers.enable(1); }}
-          />
-        ))}
-      </group>
+      {/* Shadow layer: orange gestrichelt, animiert — Select enabled markiert
+          diese Gruppe für den SelectiveBloom-Pass in HeroScene. */}
+      <Select enabled>
+        <group ref={shadowGroupRef} layers={1}>
+          {shadowPaths.map((p, i) => (
+            <line
+              key={`s${i}`}
+              geometry={p.geo}
+              material={shadowMaterials[i]}
+              ref={(el) => { if (el) el.layers.enable(1); }}
+            />
+          ))}
+        </group>
+      </Select>
     </>
   );
 });

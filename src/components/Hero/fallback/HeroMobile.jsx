@@ -86,11 +86,10 @@ export default function HeroMobile() {
       ref={sectionRef}
       id="hero"
       data-bg="light"
-      className="relative px-5 pt-20 pb-10"
-      style={{ minHeight: '100vh' }}
+      className="relative px-5 pt-24 pb-10"
     >
       {/* Sticky-Container — die SVG bleibt sichtbar während die Anchors durchscrollen */}
-      <div className="sticky top-16 z-10 flex flex-col gap-4">
+      <div className="sticky top-20 z-10 flex flex-col gap-4">
 
         {/* Headline */}
         <h1

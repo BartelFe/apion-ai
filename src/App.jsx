@@ -21,7 +21,13 @@ export default function App() {
   useLenis();
 
   useEffect(() => {
-    document.fonts.ready.then(() => ScrollTrigger.refresh());
+    // Race document.fonts.ready gegen 1500ms Timeout — falls eine Font hängt
+    // (langsames CDN, Glitch), läuft ScrollTrigger.refresh() trotzdem und
+    // Sections pinnen an den korrekten Scroll-Positionen.
+    const timeout = new Promise((r) => setTimeout(r, 1500));
+    Promise.race([document.fonts.ready, timeout]).then(() => {
+      ScrollTrigger.refresh();
+    });
   }, []);
 
   return (

@@ -1,5 +1,6 @@
 import { useMemo, useRef, useImperativeHandle, forwardRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Select } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { c3 } from '../../../lib/tokens';
 import { stationById } from '../constants/stations.config';
@@ -45,6 +46,19 @@ const Particles = forwardRef(function Particles(_, ref) {
 
   const flowCurvesMemo   = useMemo(() => flowCurves(), []);
   const shadowCurvesMemo = useMemo(() => shadowCurves(), []);
+
+  // Pre-compute Named-Auftrag-Curves einmal — ohne wären es Vector3-
+  // Allokationen pro Frame und damit GC-Druck auf langen Sessions.
+  const namedCurves = useMemo(() => {
+    const route = NAMED_AUFTRAG.route;
+    const curves = [];
+    for (let i = 0; i < route.length - 1; i++) {
+      const fromPos = stationById(route[i]).pos;
+      const toPos   = stationById(route[i + 1]).pos;
+      curves.push(buildPath(fromPos, toPos, { lift: 0.6 }));
+    }
+    return curves;
+  }, []);
 
   // Initialisierung der Partikel-States.
   useMemo(() => {
@@ -164,16 +178,13 @@ const Particles = forwardRef(function Particles(_, ref) {
 
     // ── Named Auftrag BV-2419 ──
     if (namedRef.current) {
-      const route = NAMED_AUFTRAG.route;
-      const segs = route.length - 1;
+      const segs = namedCurves.length;
       // namedProgress 0..1 → segmente verteilen
       const p = THREE.MathUtils.clamp(S.namedProgress, 0, 1);
       const idx = Math.min(segs - 1, Math.floor(p * segs));
       const localT = (p * segs) - idx;
 
-      const fromPos = stationById(route[idx]).pos;
-      const toPos   = stationById(route[idx + 1]).pos;
-      const curve   = buildPath(fromPos, toPos, { lift: 0.6 });
+      const curve = namedCurves[idx];
 
       // Stuck-State: Partikel verharrt am Endpunkt + zittert leicht
       const eff = S.namedStuck > 0 ? 0.95 : localT;
@@ -203,31 +214,34 @@ const Particles = forwardRef(function Particles(_, ref) {
         <meshBasicMaterial color={c3.ink} transparent opacity={0.85} />
       </instancedMesh>
 
-      {/* Shadow-Partikel — auf Layer 1 für Bloom */}
-      <instancedMesh
-        ref={shadowMeshRef}
-        args={[null, null, shadowCount]}
-        onUpdate={(self) => self.layers.enable(1)}
-      >
-        <sphereGeometry args={[1, 12, 12]} />
-        <meshBasicMaterial color={c3.trace} transparent opacity={0.95} />
-      </instancedMesh>
+      {/* Shadow-Partikel + Named Auftrag — Select enabled markiert sie für
+          den SelectiveBloom-Pass in HeroScene. */}
+      <Select enabled>
+        <instancedMesh
+          ref={shadowMeshRef}
+          args={[null, null, shadowCount]}
+          onUpdate={(self) => self.layers.enable(1)}
+        >
+          <sphereGeometry args={[1, 12, 12]} />
+          <meshBasicMaterial color={c3.trace} transparent opacity={0.95} />
+        </instancedMesh>
 
-      {/* Named Auftrag BV-2419 — Halo + Core */}
-      <mesh
-        ref={haloRef}
-        onUpdate={(self) => self.layers.enable(1)}
-      >
-        <sphereGeometry args={[0.22, 24, 24]} />
-        <meshBasicMaterial color={c3.trace} transparent opacity={0.3} />
-      </mesh>
-      <mesh
-        ref={namedRef}
-        onUpdate={(self) => self.layers.enable(1)}
-      >
-        <sphereGeometry args={[1, 24, 24]} />
-        <meshBasicMaterial color={c3.trace} transparent opacity={1} />
-      </mesh>
+        {/* Named Auftrag BV-2419 — Halo + Core */}
+        <mesh
+          ref={haloRef}
+          onUpdate={(self) => self.layers.enable(1)}
+        >
+          <sphereGeometry args={[0.22, 24, 24]} />
+          <meshBasicMaterial color={c3.trace} transparent opacity={0.3} />
+        </mesh>
+        <mesh
+          ref={namedRef}
+          onUpdate={(self) => self.layers.enable(1)}
+        >
+          <sphereGeometry args={[1, 24, 24]} />
+          <meshBasicMaterial color={c3.trace} transparent opacity={1} />
+        </mesh>
+      </Select>
     </>
   );
 });

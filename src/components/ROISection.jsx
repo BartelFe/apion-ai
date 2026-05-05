@@ -137,6 +137,8 @@ function Slider({ label, unit, min, max, value, onChange, trace = false }) {
         type="range"
         min={min} max={max} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        aria-label={label}
+        aria-valuetext={`${value} ${unit}`}
         style={{
           width: '100%',
           appearance: 'none',
@@ -154,17 +156,18 @@ function Slider({ label, unit, min, max, value, onChange, trace = false }) {
         <span>{min}</span>
         <span>{max}</span>
       </div>
+      {/* Thumb 22px (vorher 14px) — WCAG 24×24 Touch-Target näher dran. */}
       <style>{`
         .apion-slider::-webkit-slider-thumb {
           -webkit-appearance: none;
-          width: 14px; height: 14px;
+          width: 22px; height: 22px;
           border-radius: 50%;
           background: var(--fg);
           cursor: pointer;
           border: 2px solid var(--bg-base, #F5F3EE);
         }
         .apion-slider::-moz-range-thumb {
-          width: 14px; height: 14px;
+          width: 22px; height: 22px;
           border-radius: 50%;
           background: var(--fg);
           cursor: pointer;

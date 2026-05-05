@@ -27,7 +27,8 @@ export default function ConsoleBar() {
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const rowHeight = 16;
+    // Row-Höhe muss zum h-5 (20px) passen, damit das Carousel sauber rastet.
+    const rowHeight = 20;
     const total = FEED.length;
     let offset = 0;
 
@@ -53,11 +54,12 @@ export default function ConsoleBar() {
         borderTop: '0.5px solid #0A0A0B',
       }}
     >
-      <div className="flex-1 overflow-hidden h-4 relative">
+      <div className="flex-1 overflow-hidden h-5 relative">
         <div ref={trackRef} className="absolute inset-x-0 top-0">
           {[...FEED, ...FEED].map((row, i) => (
-            <div key={i} className="flex gap-3 h-4 items-center">
-              <span style={{ color: '#F5F3EE' }}>{row.time}</span>
+            <div key={i} className="flex gap-3 h-5 items-center">
+              {/* Timestamp shrinkt unter sm — sonst clippt sie auf 320–360px Devices */}
+              <span className="text-[10px] sm:text-[11px]" style={{ color: '#F5F3EE' }}>{row.time}</span>
               <span style={{ color: '#6E6E70' }}>·</span>
               <span style={{ color: row.kind === 'trace' ? '#D4571B' : 'rgba(245,243,238,0.65)' }}>
                 {row.text}

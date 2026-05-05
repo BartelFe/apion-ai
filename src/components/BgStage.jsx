@@ -17,6 +17,8 @@ export default function BgStage() {
 
   useEffect(() => {
     const root = document.documentElement;
+    let cancelled = false;
+    let triggers = [];
 
     const tweenTo = (mode) => {
       const m = bgModes[mode] || bgModes.light;
@@ -31,22 +33,32 @@ export default function BgStage() {
 
     tweenTo('light');
 
-    const sections = document.querySelectorAll('[data-bg]');
-    const triggers = [];
-
-    sections.forEach((sec) => {
-      const mode = sec.getAttribute('data-bg');
-      const t = ScrollTrigger.create({
-        trigger: sec,
-        start: 'top 95%',
-        end: 'bottom 5%',
-        onEnter: () => tweenTo(mode),
-        onEnterBack: () => tweenTo(mode),
+    // Defer Section-Query bis Fonts ready / 1.5s Timeout — sonst kann es bei
+    // HMR/StrictMode passieren, dass [data-bg]-Sections noch nicht im DOM
+    // sind, wenn BgStage seine Trigger registriert.
+    const setupTriggers = () => {
+      if (cancelled) return;
+      const sections = document.querySelectorAll('[data-bg]');
+      sections.forEach((sec) => {
+        const mode = sec.getAttribute('data-bg');
+        const t = ScrollTrigger.create({
+          trigger: sec,
+          start: 'top 95%',
+          end: 'bottom 5%',
+          onEnter: () => tweenTo(mode),
+          onEnterBack: () => tweenTo(mode),
+        });
+        triggers.push(t);
       });
-      triggers.push(t);
-    });
+    };
 
-    return () => triggers.forEach((t) => t.kill());
+    const timeout = new Promise((r) => setTimeout(r, 1500));
+    Promise.race([document.fonts.ready, timeout]).then(setupTriggers);
+
+    return () => {
+      cancelled = true;
+      triggers.forEach((t) => t.kill());
+    };
   }, []);
 
   return (

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useMemo, useRef, useImperativeHandle, forwardRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { c3 } from '../../lib/tokens';
@@ -179,15 +179,52 @@ const DiagnoseScene = forwardRef(function DiagnoseScene(_, ref) {
 });
 
 const DiagnoseDiagram = forwardRef(function DiagnoseDiagram(_, ref) {
+  const wrapperRef = useRef();
+  const [active, setActive] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+
+  // Frameloop pausieren wenn out-of-viewport.
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setActive(entry.isIntersecting),
+      { rootMargin: '100px' }
+    );
+    obs.observe(wrapperRef.current);
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      camera={{ position: [0, 0, 7], fov: 48 }}
-      gl={{ antialias: true, alpha: true }}
-      dpr={[1, 2]}
-      style={{ width: '100%', height: '100%' }}
-    >
-      <DiagnoseScene ref={ref} />
-    </Canvas>
+    <div ref={wrapperRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <Canvas
+        camera={{ position: [0, 0, 7], fov: 48 }}
+        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 2]}
+        frameloop={active ? 'always' : 'demand'}
+        onCreated={() => setLoaded(true)}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <DiagnoseScene ref={ref} />
+      </Canvas>
+      {/* Loading-Skeleton — fadet weg sobald Canvas mountet */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: 'JetBrains Mono, SF Mono, Menlo, monospace',
+          fontSize: '10px',
+          color: 'var(--fg-muted)',
+          letterSpacing: '0.18em',
+          pointerEvents: 'none',
+          opacity: loaded ? 0 : 0.55,
+          transition: 'opacity 0.5s ease',
+          animation: loaded ? 'none' : 'apionSkeletonPulse 1.6s ease-in-out infinite',
+        }}
+      >
+        // rendering scene
+      </div>
+    </div>
   );
 });
 

@@ -42,6 +42,21 @@ export default function DiagnoseSection() {
     const sticky = stickyRef.current;
     if (!section || !sticky) return;
 
+    // Reduced-Motion: keinen Pin/Scrub einrichten — letzte Phase statisch
+    // anzeigen + Diagramm auf Final-Progress, damit Inhalte sichtbar bleiben.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      diagramRef.current?.setProgress(1);
+      phaseRefs.current.forEach((phase, i) => {
+        if (!phase) return;
+        const isLast = i === phaseRefs.current.length - 1;
+        gsap.set(phase, { opacity: isLast ? 1 : 0, y: 0 });
+      });
+      labelRefs.current.forEach((label) => {
+        if (label) gsap.set(label, { opacity: 1, scale: 1 });
+      });
+      return;
+    }
+
     const pin = ScrollTrigger.create({
       trigger: section,
       start: 'top top',
@@ -114,7 +129,10 @@ export default function DiagnoseSection() {
       ref={sectionRef}
       data-bg="vignette"
       className="relative"
-      style={{ height: '400vh', background: '#08070A' }}
+      // pinSpacing:true im ScrollTrigger fügt die Scroll-Länge automatisch
+      // hinzu — kein eigenes height: 400vh nötig (würde sonst 100vh
+      // Dead-Space am Ende erzeugen).
+      style={{ background: '#08070A' }}
     >
       {/*
         Sticky viewport-height container.

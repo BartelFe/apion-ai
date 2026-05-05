@@ -121,6 +121,15 @@ export default function StoriesSection() {
     track.addEventListener('mouseup', onUp);
     track.addEventListener('mousemove', onMove, { passive: false });
 
+    // Tastatur-Nav — ArrowLeft/Right scrollt um eine Karten-Breite (~600px)
+    const onKey = (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 600 : -600;
+      track.scrollBy({ left: delta, behavior: 'smooth' });
+    };
+    track.addEventListener('keydown', onKey);
+
     return () => {
       ctx.revert();
       observer.disconnect();
@@ -128,6 +137,7 @@ export default function StoriesSection() {
       track.removeEventListener('mouseleave', onLeave);
       track.removeEventListener('mouseup', onUp);
       track.removeEventListener('mousemove', onMove);
+      track.removeEventListener('keydown', onKey);
     };
   }, []);
 
@@ -177,10 +187,13 @@ export default function StoriesSection() {
         </div>
       </div>
 
-      {/* Horizontal scroll track */}
+      {/* Horizontal scroll track — tabIndex=0 + ArrowKey-Nav für a11y */}
       <div
         ref={trackRef}
         className="stories-track"
+        tabIndex={0}
+        role="region"
+        aria-label="Geschichten — horizontal scrollbar, mit Pfeiltasten navigieren"
         style={{
           gap: '12px',
           paddingLeft: '20px',
@@ -192,6 +205,7 @@ export default function StoriesSection() {
           <article
             key={i}
             ref={(el) => (cardRefs.current[i] = el)}
+            tabIndex={0}
             style={{
               flex: '0 0 min(580px, calc(100vw - 52px))',
               scrollSnapAlign: 'start',
