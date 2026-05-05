@@ -54,14 +54,18 @@ export default function ConsoleBar() {
         borderTop: '0.5px solid #0A0A0B',
       }}
     >
-      <div className="flex-1 overflow-hidden h-5 relative">
+      <div className="flex-1 overflow-hidden h-5 relative min-w-0">
         <div ref={trackRef} className="absolute inset-x-0 top-0">
           {[...FEED, ...FEED].map((row, i) => (
-            <div key={i} className="flex gap-3 h-5 items-center">
-              {/* Timestamp shrinkt unter sm — sonst clippt sie auf 320–360px Devices */}
-              <span className="text-[10px] sm:text-[11px]" style={{ color: '#F5F3EE' }}>{row.time}</span>
-              <span style={{ color: '#6E6E70' }}>·</span>
-              <span style={{ color: row.kind === 'trace' ? '#D4571B' : 'rgba(245,243,238,0.65)' }}>
+            <div key={i} className="flex gap-3 h-5 items-center min-w-0">
+              {/* Time + Dot unter sm versteckt — auf 320–360px Geräten gibt's
+                  sonst keinen Platz für die Message ohne Wrap. */}
+              <span className="hidden sm:inline" style={{ color: '#F5F3EE' }}>{row.time}</span>
+              <span className="hidden sm:inline" style={{ color: '#6E6E70' }}>·</span>
+              <span
+                className="truncate min-w-0 flex-1"
+                style={{ color: row.kind === 'trace' ? '#D4571B' : 'rgba(245,243,238,0.65)' }}
+              >
                 {row.text}
               </span>
             </div>

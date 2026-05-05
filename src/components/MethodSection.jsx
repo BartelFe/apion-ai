@@ -134,7 +134,7 @@ export default function MethodSection() {
                     opacity: 0,
                   }}
                 />
-                <div data-phase-card className="md:pl-8" style={{ opacity: 0 }}>
+                <div data-phase-card className="md:pl-8 md:pt-10" style={{ opacity: 0 }}>
                   <div className="font-mono text-[10px] mb-3" style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}>
                     {phase.no} · phase
                   </div>

@@ -24,7 +24,10 @@ html, body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  /* `clip` statt `hidden` — `hidden` erzeugt einen Scroll-Context und bricht
+     position:sticky in Descendants (s. HeroMobile auf iOS). `clip` cuttet
+     ohne Scroll-Context. iOS Safari ≥16 + alle modernen Browser. */
+  overflow-x: clip;
 }
 
 body {

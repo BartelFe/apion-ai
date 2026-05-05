@@ -210,8 +210,9 @@ export default function DiagnoseSection() {
             style={{ background: 'rgba(245,243,238,0.1)' }}
           />
 
-          {/* Phase text stack */}
-          <div className="relative" style={{ minHeight: '200px' }}>
+          {/* Phase text stack — minHeight wächst mit Headline-Größe damit
+              Phase-Wechsel keinen Höhensprung erzeugt. */}
+          <div className="relative" style={{ minHeight: 'clamp(280px, 30vh, 360px)' }}>
             {PHASES.map((phase, i) => (
               <div
                 key={i}
@@ -224,7 +225,7 @@ export default function DiagnoseSection() {
                 <h2
                   className="editorial-display mt-4 whitespace-pre-line"
                   style={{
-                    fontSize: 'clamp(16px, 1.55vw, 23px)',
+                    fontSize: 'clamp(24px, 3.6vw, 42px)',
                     color: 'var(--fg)',
                     lineHeight: 1.28,
                   }}
@@ -234,10 +235,10 @@ export default function DiagnoseSection() {
                 <p
                   className="mt-4"
                   style={{
-                    fontSize: '13px',
+                    fontSize: 'clamp(14px, 1.1vw, 16px)',
                     lineHeight: 1.65,
                     color: 'var(--fg-muted)',
-                    maxWidth: '320px',
+                    maxWidth: '360px',
                   }}
                 >
                   {phase.body}
