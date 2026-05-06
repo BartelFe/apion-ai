@@ -26,20 +26,8 @@ function activeFromProgress(p) {
   return PHASE_BREAKS.length;
 }
 
-// Slot-Definition für die Mobile-Variante: jeder Slot ist eine eigene
-// Section. Selbe Inhalte wie Desktop, nur ohne opacity-stacking.
-const SLOTS = [
-  { type: 'intro' },
-  { type: 'pattern', pattern: PATTERNS[0] },
-  { type: 'pattern', pattern: PATTERNS[1] },
-  { type: 'pattern', pattern: PATTERNS[2] },
-  { type: 'pattern', pattern: PATTERNS[3] },
-  { type: 'outro' },
-];
-
 export default function DiagnoseSection() {
-  // <768px → Mobile-Stack, sonst Desktop-Pin/Scrub. matchMedia reagiert
-  // live auf Resize, also wechselt das Layout korrekt beim Drehen.
+  // <768px → Mobile-Layout (Intro + Carousel + Outro), sonst Desktop-Pin/Scrub.
   const isMobile = useMediaQuery('(max-width: 767px)');
 
   if (isMobile) return <DiagnoseMobile />;
@@ -174,8 +162,8 @@ function DiagnoseDesktop() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE — 6 stacked sections, kein Pin, kein Scrub, natural scroll.
-// Jede Section: Viz oben (~55vh) + Text drunter (auto height, min 30vh).
+// MOBILE — Intro-Bookend + horizontaler Pattern-Carousel + Outro-Bookend.
+// Statt 6 stacked Sections (~510vh) → ~290vh: 100vh + 90vh + 100vh.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function DiagnoseMobile() {
@@ -192,64 +180,310 @@ function DiagnoseMobile() {
         '--line-strong': 'rgba(245, 243, 238, 0.32)',
       }}
     >
-      {SLOTS.map((slot, i) => (
-        <MobileSlot key={i} slot={slot} index={i} />
-      ))}
+      <MobileBookend type="intro" />
+      <MobilePatternCarousel patterns={PATTERNS} />
+      <MobileBookend type="outro" />
     </section>
   );
 }
 
-function MobileSlot({ slot, index }) {
+// Intro/Outro: vertikaler Stack (Viz oben 55vh + Text drunter), ~100vh hoch.
+// Bewusst keine stacked-section-Numerierung — die Bookends sind narrative
+// Klammern, nicht Carousel-Mitglieder.
+function MobileBookend({ type }) {
   return (
     <div
       className="w-full flex flex-col"
-      style={{ minHeight: '85vh' }}
+      style={{ minHeight: '100vh' }}
     >
-      {/* Viz top — 55vh, fingerprint mit mobile-prop für scaled-up fonts */}
       <div
         className="relative"
         style={{ height: '55vh', overflow: 'hidden' }}
       >
-        {renderFingerprint(slot, true)}
-
-        {/* Top-right phase indicator (statisch, einer pro Slot) */}
-        <div
-          className="absolute top-4 right-4 font-mono pointer-events-none"
-          style={{
-            fontSize: '10px',
-            color: 'var(--fg-muted)',
-            letterSpacing: '0.18em',
-          }}
-        >
-          {String(index + 1).padStart(2, '0')} / 06
-        </div>
+        {type === 'intro' && <FingerprintIntro mobile={true} />}
+        {type === 'outro' && <FingerprintOutro mobile={true} />}
       </div>
-
-      {/* Text below — auto height, padding generous to clear ConsoleBar */}
       <div className="px-5 pt-8 pb-12">
-        {slot.type === 'intro' && <IntroText />}
-        {slot.type === 'pattern' && <PatternText pattern={slot.pattern} />}
-        {slot.type === 'outro' && <OutroText />}
+        {type === 'intro' && <IntroText />}
+        {type === 'outro' && <OutroText />}
       </div>
     </div>
   );
 }
 
-function renderFingerprint(slot, mobile) {
-  if (slot.type === 'intro') return <FingerprintIntro mobile={mobile} />;
-  if (slot.type === 'outro') return <FingerprintOutro mobile={mobile} />;
-  switch (slot.pattern.id) {
-    case 'crm':        return <FingerprintCRM mobile={mobile} />;
-    case 'phone':      return <FingerprintPhone mobile={mobile} />;
-    case 'whatsapp':   return <FingerprintWhatsApp mobile={mobile} />;
-    case 'whiteboard': return <FingerprintWhiteboard mobile={mobile} />;
-    default:           return null;
-  }
+// Pattern-Carousel: 4 horizontale Cards mit native CSS scroll-snap.
+// IntersectionObserver tracked aktive Card → Dots-State.
+// First-Visit-Nudge "→ WISCHEN" via sessionStorage einmal pro Session.
+function MobilePatternCarousel({ patterns }) {
+  const carouselRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [showNudge, setShowNudge] = useState(false);
+
+  // Welche Card ist gerade ≥60% sichtbar → das ist die aktive.
+  useEffect(() => {
+    const root = carouselRef.current;
+    if (!root) return;
+    const items = root.querySelectorAll('.pattern-carousel-item');
+    if (!items.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+            const idx = Array.from(items).indexOf(entry.target);
+            if (idx >= 0) setActiveIndex(idx);
+          }
+        });
+      },
+      { root, threshold: [0.6, 0.8, 1] }
+    );
+
+    items.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, []);
+
+  // First-Visit "→ WISCHEN"-Nudge: 1.5s delay, 4s pulsing, dann weg.
+  // sessionStorage = nur einmal pro Tab-Session.
+  useEffect(() => {
+    if (sessionStorage.getItem('apion-carousel-nudge-seen')) return;
+    const t1 = setTimeout(() => setShowNudge(true), 1500);
+    const t2 = setTimeout(() => {
+      setShowNudge(false);
+      sessionStorage.setItem('apion-carousel-nudge-seen', '1');
+    }, 5500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+
+  // Bonus: erste echte Swipe-Geste killt den Nudge sofort.
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      setShowNudge(false);
+      sessionStorage.setItem('apion-carousel-nudge-seen', '1');
+      el.removeEventListener('scroll', onScroll);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const goToCard = (index) => {
+    const items = carouselRef.current?.querySelectorAll('.pattern-carousel-item');
+    items?.[index]?.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
+  };
+
+  return (
+    <div
+      className="w-full flex flex-col py-8"
+      style={{ minHeight: '90vh' }}
+    >
+      <div className="pattern-carousel" ref={carouselRef}>
+        {patterns.map((p, i) => (
+          <div key={p.id} className="pattern-carousel-item">
+            <PatternCard pattern={p} index={i} />
+          </div>
+        ))}
+      </div>
+
+      {/* Dots + WISCHEN-Nudge */}
+      <div className="flex items-center justify-center gap-2 mt-6">
+        {patterns.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => goToCard(i)}
+            aria-label={`Muster ${i + 1} anzeigen`}
+            aria-current={activeIndex === i ? 'true' : 'false'}
+            className="block transition-all duration-300 ease-out"
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: activeIndex === i ? '#D4571B' : 'rgba(245,243,238,0.22)',
+              transform: activeIndex === i ? 'scale(1.6)' : 'scale(1)',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
+          />
+        ))}
+        {showNudge && (
+          <span
+            className="font-mono ml-4 animate-pulse"
+            style={{
+              fontSize: '10px',
+              color: '#D4571B',
+              letterSpacing: '0.18em',
+            }}
+          >
+            → WISCHEN
+          </span>
+        )}
+      </div>
+
+      {/* Carousel-CSS — scoped via class. scrollbar hidden, snap mandatory,
+          overscroll-y bubbling damit Page-Scroll durchgeht. */}
+      <style>{`
+        .pattern-carousel {
+          display: flex;
+          overflow-x: auto;
+          overflow-y: visible;
+          scroll-snap-type: x mandatory;
+          scroll-behavior: smooth;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          padding-inline: 5vw;
+          gap: 4vw;
+          overscroll-behavior-x: contain;
+          overscroll-behavior-y: auto;
+        }
+        .pattern-carousel::-webkit-scrollbar { display: none; }
+        .pattern-carousel-item {
+          flex: 0 0 86vw;
+          scroll-snap-align: center;
+          scroll-snap-stop: always;
+          display: flex;
+          flex-direction: column;
+          max-height: 88vh;
+          overflow-y: auto;
+          overflow-x: hidden;
+          -webkit-overflow-scrolling: touch;
+        }
+        .pattern-carousel-item::-webkit-scrollbar { display: none; }
+      `}</style>
+    </div>
+  );
+}
+
+function PatternCard({ pattern, index }) {
+  return (
+    <div className="flex flex-col w-full">
+      {/* Top mono indicator — MUSTER 0X / 04 */}
+      <div
+        className="font-mono mb-3"
+        style={{
+          fontSize: '11px',
+          color: '#D4571B',
+          letterSpacing: '0.18em',
+        }}
+      >
+        MUSTER {String(index + 1).padStart(2, '0')} / 04
+      </div>
+
+      {/* Fingerprint SVG ~38vh */}
+      <div
+        className="relative w-full mb-6"
+        style={{ height: '38vh', overflow: 'hidden' }}
+      >
+        {pattern.id === 'crm'        && <FingerprintCRM mobile={true} />}
+        {pattern.id === 'phone'      && <FingerprintPhone mobile={true} />}
+        {pattern.id === 'whatsapp'   && <FingerprintWhatsApp mobile={true} />}
+        {pattern.id === 'whiteboard' && <FingerprintWhiteboard mobile={true} />}
+      </div>
+
+      {/* Pattern title — italic Newsreader, größer als Desktop */}
+      <h3
+        className="editorial-display mb-6"
+        style={{
+          fontStyle: 'italic',
+          fontWeight: 300,
+          fontSize: 'clamp(28px, 7vw, 36px)',
+          color: 'var(--fg)',
+          lineHeight: 1.15,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {pattern.name}
+      </h3>
+
+      {/* Wir finden ihn bei */}
+      <div className="mb-6">
+        <div
+          className="mono-eyebrow mb-2"
+          style={{ color: 'var(--fg-muted)', letterSpacing: '0.14em' }}
+        >
+          → wir finden ihn bei
+        </div>
+        <ul className="list-none pl-0 m-0 space-y-1">
+          {pattern.foundIn.map((line, i) => (
+            <li
+              key={i}
+              className="font-mono"
+              style={{ fontSize: '12px', color: 'var(--fg)', letterSpacing: '0.02em' }}
+            >
+              <span style={{ color: 'var(--fg-muted)', marginRight: '8px' }}>·</span>
+              {line}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Pull-Quote mit orange Bar links */}
+      <div className="mb-6 relative" style={{ paddingLeft: '14px' }}>
+        <div
+          className="absolute left-0 top-1 bottom-1"
+          style={{ width: '2px', background: '#D4571B' }}
+        />
+        <div
+          className="mono-eyebrow mb-2"
+          style={{ color: 'var(--fg-muted)', letterSpacing: '0.14em' }}
+        >
+          → wie er sich anfühlt
+        </div>
+        <p
+          className="editorial-display"
+          style={{
+            fontSize: '15px',
+            color: 'var(--fg)',
+            fontStyle: 'italic',
+            lineHeight: 1.5,
+            fontWeight: 300,
+          }}
+        >
+          „{pattern.feeling}"
+        </p>
+      </div>
+
+      {/* Schaden in Zahlen */}
+      <div>
+        <div
+          className="mono-eyebrow mb-3"
+          style={{ color: 'var(--fg-muted)', letterSpacing: '0.14em' }}
+        >
+          → schaden in zahlen
+        </div>
+        <div className="flex flex-col gap-2">
+          {pattern.damages.map((d, i) => (
+            <div key={i} className="flex items-baseline gap-3">
+              <span
+                className="editorial-display"
+                style={{ fontSize: '22px', color: '#D4571B', lineHeight: 1 }}
+              >
+                {d.value}
+              </span>
+              <span
+                className="font-mono"
+                style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.04em' }}
+              >
+                {d.unit}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Layer wrappers — alle Phasen werden im selben Grid-Cell gerendert,
-// nur die aktive ist sichtbar (opacity 1). Nur für Desktop.
+// Desktop-only Layer wrappers — Crossfade über CSS-Grid (gleiche Cell).
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FingerprintSlot({ active, children }) {
@@ -287,7 +521,7 @@ function PhaseSlot({ active, children }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase-Inhalte
+// Phase-Inhalte — Desktop-PhaseSlots + Mobile-Bookends teilen sie sich.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function IntroText() {
