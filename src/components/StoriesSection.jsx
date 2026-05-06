@@ -1,15 +1,19 @@
 // StoriesSection.jsx — Drei Diagnosen aus der Praxis
-// Editorial-Row-Layout: jede Reihe = ein Case, click expandiert inline
-// das Detail-Panel (Bild + Diagnose-Absatz + Pull-Quote + Messung-Rows).
 //
-// Architektur:
-// - State: ein `openCaseNo` oder null. Click auf Reihe toggelt. Andere Reihe
-//   anklicken schließt aktuelle, öffnet neue. ESC schließt alles.
-// - Layout: editorial rows (wie ein Magazin-Inhaltsverzeichnis), nicht
-//   3-up Card-Grid. Skaliert linear für n Cases.
-// - Bilder: Case 01 (GP, named) bekommt das echte GP-Projektfoto. Cases
-//   02 und 03 (pseudonymisiert) bekommen typografische SVG-Plates statt
-//   Stock-Photos — editorial-coherent, ehrlich abstrakt, brand-konsistent.
+// Editorial-Row-Layout mit sichtbarer Bild-Spalte links (3:2 thumb) und
+// Text-Spalte rechts. Click expandiert das Detail-Panel inline (Hero-Bild
+// 16:9 + Diagnose + Pull-Quote + Messung-Rows).
+//
+// Bild-Strategie:
+// - Case 01 (GEBRÜDER PETERS, named): echtes GP-Projektfoto in beiden
+//   Größen (3:2 thumb in der Reihe, 16:9 hero im Detail).
+// - Cases 02 + 03 (pseudonymisiert): typografische Plates (SVG) statt
+//   Stock-Photos. Editorial-Buchcover-Stil. Brand-coherent, ehrlich
+//   abstrakt. Zwei Varianten: 3:2 thumb für die Reihe, 16:9 hero für
+//   das Detail.
+//
+// Layout-Konsistenz: alle Cases haben dieselbe Zeilenstruktur — egal ob
+// Foto oder Plate. Das ist das Fundament der "auflockernd"-Wirkung.
 
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
@@ -19,10 +23,7 @@ import { useLineReveal } from '../hooks/useScrollReveal';
 gsap.registerPlugin(ScrollTrigger);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CASE-DATEN — Schema ist generisch: Felix kann beliebig viele Cases hinzufügen
-// ohne Layout-Anpassung. Pflichtfelder: caseNo, status, meta, headline,
-// patterns, metric, metricUnit, metricCaption, image*, detail.intro,
-// detail.keyMetrics. Optional: client (null = pseudonymisiert), pullQuote.
+// CASE-DATEN
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GP_PHOTO = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_AUDI-T02-II-BA-aspect-ratio-1-1-1024x1024.jpg';
@@ -121,7 +122,6 @@ export default function StoriesSection() {
   const headlineRef = useLineReveal('top 72%');
   const [openCaseNo, setOpenCaseNo] = useState(null);
 
-  // ESC schließt alle offenen Cases — accessibility expectation
   useEffect(() => {
     if (!openCaseNo) return;
     const handler = (e) => { if (e.key === 'Escape') setOpenCaseNo(null); };
@@ -142,7 +142,6 @@ export default function StoriesSection() {
         '--line-strong': 'rgba(10,10,11,0.35)',
       }}
     >
-      {/* Section-Header */}
       <div ref={headlineRef} className="max-w-5xl mx-auto mb-24 md:mb-32">
         <div className="mono-eyebrow" style={{ color: 'var(--fg-muted)' }}>
           03 · drei diagnosen
@@ -168,7 +167,6 @@ export default function StoriesSection() {
         </p>
       </div>
 
-      {/* Cases — top hairline + alle rows */}
       <div className="max-w-6xl mx-auto">
         <div className="h-px" style={{ background: 'var(--line-strong)' }} />
         {CASES.map((caseData) => (
@@ -187,7 +185,7 @@ export default function StoriesSection() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CASE-ROW — Click-to-Expand mit GSAP-gemessener Höhen-Animation
+// CASE-ROW — 2-Spalten-Layout: Bild-Thumb links + Text-Spalte rechts
 // ─────────────────────────────────────────────────────────────────────────────
 
 function CaseRow({ data, isOpen, onToggle }) {
@@ -195,8 +193,7 @@ function CaseRow({ data, isOpen, onToggle }) {
   const contentRef = useRef(null);
   const articleRef = useRef(null);
 
-  // Open/Close-Animation: misst echte Content-Höhe, animiert wrapper-Höhe.
-  // Fallback bei reduced-motion: sofort visible/hidden ohne Tween.
+  // Open/Close-Animation: misst Content-Höhe, animiert Wrapper-Höhe smooth.
   useEffect(() => {
     const wrap    = wrapRef.current;
     const content = contentRef.current;
@@ -210,7 +207,6 @@ function CaseRow({ data, isOpen, onToggle }) {
         gsap.set(content, { opacity: 1, y: 0 });
         return;
       }
-      // Erst auf "auto" setzen für Messung, dann 0, dann animieren.
       gsap.set(wrap, { height: 'auto' });
       const target = wrap.offsetHeight;
       gsap.set(wrap, { height: 0 });
@@ -229,7 +225,6 @@ function CaseRow({ data, isOpen, onToggle }) {
         gsap.set(wrap, { height: 0 });
         return;
       }
-      // Lock current height (in px), dann auf 0 animieren.
       gsap.set(wrap, { height: wrap.offsetHeight });
       gsap.to(wrap, {
         height: 0,
@@ -245,7 +240,7 @@ function CaseRow({ data, isOpen, onToggle }) {
     }
   }, [isOpen]);
 
-  // Initial-Reveal beim Scrollen — die ganze Article-Box fadet rein
+  // Article fade-in beim Scrollen
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       if (articleRef.current) articleRef.current.style.opacity = '1';
@@ -272,7 +267,6 @@ function CaseRow({ data, isOpen, onToggle }) {
         opacity: 0,
       }}
     >
-      {/* Klickbare Header-Region — ganze Reihe ist click-target */}
       <button
         onClick={onToggle}
         aria-expanded={isOpen}
@@ -287,105 +281,124 @@ function CaseRow({ data, isOpen, onToggle }) {
           fontFamily: 'inherit',
         }}
       >
-        {/* Eyebrow */}
-        <div
-          className="flex items-center gap-3 font-mono mb-6 md:mb-8"
-          style={{ fontSize: '11px', letterSpacing: '0.18em' }}
-        >
-          <span style={{ color: '#D4571B' }}>FALL.{data.caseNo}</span>
-          <span style={{ color: 'var(--line-strong)' }}>·</span>
-          <span style={{ color: 'var(--fg-muted)' }}>{data.status}</span>
-        </div>
+        {/* 2-Spalten-Layout: Thumb links, Text rechts */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 items-start">
 
-        {/* Headline — der Hook */}
-        <h3
-          className="editorial-display transition-transform duration-500 group-hover:translate-x-1"
-          style={{
-            fontSize: 'clamp(26px, 3.8vw, 48px)',
-            lineHeight: 1.12,
-            letterSpacing: '-0.015em',
-            fontStyle: 'italic',
-            fontWeight: 300,
-            maxWidth: '900px',
-          }}
-        >
-          {data.headline}
-        </h3>
+          {/* Bild-Spalte */}
+          <div className="md:col-span-4">
+            {data.imageType === 'photo' ? (
+              <RowImage src={data.imageUrl} alt={data.imageCaption} isOpen={isOpen} />
+            ) : (
+              <RowPlate
+                caseNo={data.caseNo}
+                pattern={data.imageData}
+                isOpen={isOpen}
+              />
+            )}
+          </div>
 
-        {/* Client + Meta */}
-        <div
-          className="mt-5 md:mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-mono"
-          style={{ fontSize: '11px', letterSpacing: '0.12em' }}
-        >
-          {data.client && (
-            <>
-              <span style={{ color: 'var(--fg)' }}>{data.client}</span>
-              <span style={{ color: 'var(--line-strong)' }}>·</span>
-            </>
-          )}
-          <span style={{ color: 'var(--fg-muted)' }}>{data.meta}</span>
-        </div>
-
-        {/* Footer-Reihe: Metric · Patterns · CTA */}
-        <div className="mt-10 md:mt-14 grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-baseline">
-          {/* Metric */}
-          <div className="md:col-span-5">
+          {/* Text-Spalte */}
+          <div className="md:col-span-8 flex flex-col">
+            {/* Eyebrow */}
             <div
-              className="mono-eyebrow mb-2"
-              style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
+              className="flex items-center gap-3 font-mono mb-6 md:mb-8"
+              style={{ fontSize: '11px', letterSpacing: '0.18em' }}
             >
-              → {data.metricCaption}
+              <span style={{ color: '#D4571B' }}>FALL.{data.caseNo}</span>
+              <span style={{ color: 'var(--line-strong)' }}>·</span>
+              <span style={{ color: 'var(--fg-muted)' }}>{data.status}</span>
             </div>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span
-                className="editorial-display"
-                style={{
-                  fontSize: 'clamp(28px, 3.6vw, 40px)',
-                  color: '#D4571B',
-                  lineHeight: 1,
-                  fontStyle: 'italic',
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                {data.metric}
-              </span>
-              <span
-                className="font-mono"
-                style={{ fontSize: '12px', color: 'var(--fg-muted)', letterSpacing: '0.04em' }}
-              >
-                {data.metricUnit}
-              </span>
-            </div>
-          </div>
 
-          {/* Patterns */}
-          <div
-            className="md:col-span-4 font-mono"
-            style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
-          >
-            <span style={{ marginRight: '8px' }}>→</span>
-            {data.patterns.length === 1
-              ? <>Muster {data.patterns[0]}</>
-              : <>Muster {data.patterns.join(' · ')}</>
-            }
-          </div>
-
-          {/* CTA */}
-          <div
-            className="md:col-span-3 md:text-right font-mono"
-            style={{ fontSize: '11px', letterSpacing: '0.18em' }}
-          >
-            <span
-              className="inline-block transition-all duration-300 group-hover:translate-x-1"
-              style={{ color: isOpen ? '#D4571B' : 'var(--fg)' }}
+            {/* Headline */}
+            <h3
+              className="editorial-display transition-transform duration-500 group-hover:translate-x-1"
+              style={{
+                fontSize: 'clamp(24px, 3.2vw, 40px)',
+                lineHeight: 1.12,
+                letterSpacing: '-0.015em',
+                fontStyle: 'italic',
+                fontWeight: 300,
+              }}
             >
-              {isOpen ? '→ SCHLIESSEN' : '→ FALL ÖFFNEN'}
-            </span>
+              {data.headline}
+            </h3>
+
+            {/* Meta */}
+            <div
+              className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-mono"
+              style={{ fontSize: '11px', letterSpacing: '0.12em' }}
+            >
+              {data.client && (
+                <>
+                  <span style={{ color: 'var(--fg)' }}>{data.client}</span>
+                  <span style={{ color: 'var(--line-strong)' }}>·</span>
+                </>
+              )}
+              <span style={{ color: 'var(--fg-muted)' }}>{data.meta}</span>
+            </div>
+
+            {/* Footer-Reihe — innerhalb der Text-Spalte */}
+            <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-4 items-baseline">
+              {/* Metric */}
+              <div className="md:col-span-5">
+                <div
+                  className="mono-eyebrow mb-2"
+                  style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
+                >
+                  → {data.metricCaption}
+                </div>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span
+                    className="editorial-display"
+                    style={{
+                      fontSize: 'clamp(26px, 3.2vw, 36px)',
+                      color: '#D4571B',
+                      lineHeight: 1,
+                      fontStyle: 'italic',
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {data.metric}
+                  </span>
+                  <span
+                    className="font-mono"
+                    style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.04em' }}
+                  >
+                    {data.metricUnit}
+                  </span>
+                </div>
+              </div>
+
+              {/* Patterns */}
+              <div
+                className="md:col-span-4 font-mono"
+                style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
+              >
+                <span style={{ marginRight: '8px' }}>→</span>
+                {data.patterns.length === 1
+                  ? <>Muster {data.patterns[0]}</>
+                  : <>Muster {data.patterns.join(' · ')}</>
+                }
+              </div>
+
+              {/* CTA */}
+              <div
+                className="md:col-span-3 md:text-right font-mono"
+                style={{ fontSize: '11px', letterSpacing: '0.18em' }}
+              >
+                <span
+                  className="inline-block transition-all duration-300 group-hover:translate-x-1"
+                  style={{ color: isOpen ? '#D4571B' : 'var(--fg)' }}
+                >
+                  {isOpen ? '→ SCHLIESSEN' : '→ FALL ÖFFNEN'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </button>
 
-      {/* Inline-Detail-Wrapper — Höhe wird gesteuert via GSAP */}
+      {/* Inline-Detail-Wrapper */}
       <div
         ref={wrapRef}
         id={`case-detail-${data.caseNo}`}
@@ -401,27 +414,143 @@ function CaseRow({ data, isOpen, onToggle }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CASE-DETAIL — Bild + Diagnose-Absatz + Pull-Quote + Messung-Rows
+// ROW IMAGE — 3:2 thumbnail Foto für die Reihe (always visible, links)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function RowImage({ src, alt, isOpen }) {
+  return (
+    <div
+      className="relative overflow-hidden transition-all duration-500"
+      style={{
+        aspectRatio: '3 / 2',
+        background: '#E5E1D8',
+        outline: isOpen ? '0.5px solid #D4571B' : '0.5px solid transparent',
+        outlineOffset: '0',
+      }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className="transition-transform duration-700 group-hover:scale-[1.02]"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center center',
+          display: 'block',
+        }}
+      />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ROW PLATE — typografisches 3:2 Thumbnail (für pseudonymisierte Cases)
+// Buchcover-Stil: italic Pattern-Code-Hero, mono caps darunter, kleine
+// header- und footer-Annotationen. Kompakt aber lesbar.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function RowPlate({ caseNo, pattern, isOpen }) {
+  return (
+    <div
+      className="relative overflow-hidden transition-all duration-500"
+      style={{
+        aspectRatio: '3 / 2',
+        background: '#EDE9DE',
+        border: '0.5px solid var(--line-strong)',
+        outline: isOpen ? '0.5px solid #D4571B' : '0.5px solid transparent',
+        outlineOffset: '0',
+      }}
+    >
+      <svg
+        viewBox="0 0 1200 800"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ width: '100%', height: '100%', display: 'block' }}
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden="true"
+      >
+        {/* Faint horizontal grid */}
+        <g stroke="#0A0A0B" strokeWidth="0.5" opacity="0.04">
+          {[120, 240, 360, 480, 600, 720].map((y) => (
+            <line key={y} x1="0" y1={y} x2="1200" y2={y} />
+          ))}
+        </g>
+
+        {/* Top-left: FALL.XX */}
+        <text
+          x="60" y="100"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="40"
+          fill="#6E6E70" letterSpacing="0.18em"
+        >
+          FALL.{caseNo}
+        </text>
+
+        {/* Top-right: MUSTER XX (orange accent) */}
+        <text
+          x="1140" y="100" textAnchor="end"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="40"
+          fill="#D4571B" letterSpacing="0.18em"
+        >
+          MUSTER {pattern.patternCode}
+        </text>
+
+        {/* Faint divider under header */}
+        <line x1="60" y1="140" x2="1140" y2="140"
+          stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
+
+        {/* The hero: gigantic italic pattern code, centered */}
+        <text
+          x="600" y="500" textAnchor="middle"
+          fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
+          fontStyle="italic" fontWeight="300"
+          fontSize="320" fill="#0A0A0B" letterSpacing="-0.04em"
+        >
+          {pattern.patternCode}
+        </text>
+
+        {/* Pattern name in mono caps */}
+        <text
+          x="600" y="600" textAnchor="middle"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="36"
+          fill="#0A0A0B" letterSpacing="0.18em"
+        >
+          {pattern.patternName.toUpperCase()}
+        </text>
+
+        {/* Bottom annotation */}
+        <text
+          x="600" y="720" textAnchor="middle"
+          fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
+          fontStyle="italic" fontWeight="300"
+          fontSize="36" fill="#6E6E70"
+        >
+          pseudonymisierter Fall
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CASE-DETAIL — expandiert inline · Hero-Bild + Diagnose + Quote + Messung
 // ─────────────────────────────────────────────────────────────────────────────
 
 function CaseDetail({ data }) {
   return (
     <div className="pb-16 md:pb-20" style={{ paddingTop: '4px' }}>
-      {/* Bild oder Typografische Plate */}
+      {/* Hero-Bild */}
       {data.imageType === 'photo' ? (
         <PhotoFigure src={data.imageUrl} caption={data.imageCaption} />
       ) : (
         <TypographicPlate caseNo={data.caseNo} pattern={data.imageData} />
       )}
 
-      {/* Inhalt — 2-Spalten auf Desktop: Text links, Messung rechts */}
+      {/* 2-Spalten unter dem Bild */}
       <div className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
-        {/* Linke Spalte: Diagnose + Pull-Quote */}
         <div className="md:col-span-7">
-          <div
-            className="mono-eyebrow mb-4"
-            style={{ color: '#D4571B', letterSpacing: '0.18em' }}
-          >
+          <div className="mono-eyebrow mb-4" style={{ color: '#D4571B', letterSpacing: '0.18em' }}>
             → DIAGNOSE
           </div>
           <p
@@ -458,11 +587,7 @@ function CaseDetail({ data }) {
               </blockquote>
               <div
                 className="mt-4 font-mono"
-                style={{
-                  fontSize: '11px',
-                  color: 'var(--fg-muted)',
-                  letterSpacing: '0.12em',
-                }}
+                style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
               >
                 → {data.detail.pullQuote.attribution}
               </div>
@@ -470,12 +595,8 @@ function CaseDetail({ data }) {
           )}
         </div>
 
-        {/* Rechte Spalte: Messung-Tabelle */}
         <div className="md:col-span-5">
-          <div
-            className="mono-eyebrow mb-4"
-            style={{ color: '#D4571B', letterSpacing: '0.18em' }}
-          >
+          <div className="mono-eyebrow mb-4" style={{ color: '#D4571B', letterSpacing: '0.18em' }}>
             → MESSUNG · IST vs. ZIEL
           </div>
           <div>
@@ -540,7 +661,7 @@ function CaseDetail({ data }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHOTO FIGURE — echtes Bild (für GP)
+// PHOTO FIGURE — Detail-Größe Foto (16:9 hero)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function PhotoFigure({ src, caption }) {
@@ -556,22 +677,15 @@ function PhotoFigure({ src, caption }) {
           loading="lazy"
           decoding="async"
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center center',
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center center',
             display: 'block',
           }}
         />
       </div>
       <figcaption
         className="mt-3 font-mono"
-        style={{
-          fontSize: '11px',
-          color: 'var(--fg-muted)',
-          letterSpacing: '0.04em',
-          lineHeight: 1.55,
-        }}
+        style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.04em', lineHeight: 1.55 }}
       >
         → {caption}
       </figcaption>
@@ -580,10 +694,7 @@ function PhotoFigure({ src, caption }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TYPOGRAPHIC PLATE — für pseudonymisierte Cases (statt Fake-Stock-Photo)
-// Editorial-Buchcover-Stil: riesige italic Pattern-Code-Zahl auf gedämpftem
-// Paper-Background, Pattern-Name in Trace-Orange als Subtitle. Brand-coherent
-// und ehrlich abstrakt.
+// TYPOGRAPHIC PLATE — Detail-Größe (16:9 hero)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function TypographicPlate({ caseNo, pattern }) {
@@ -600,115 +711,75 @@ function TypographicPlate({ caseNo, pattern }) {
         <svg
           viewBox="0 0 1600 900"
           xmlns="http://www.w3.org/2000/svg"
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'block',
-          }}
+          style={{ width: '100%', height: '100%', display: 'block' }}
           preserveAspectRatio="xMidYMid meet"
           aria-hidden="true"
         >
-          {/* Faint horizontal grid for blueprint feeling */}
           <g stroke="#0A0A0B" strokeWidth="0.5" opacity="0.04">
             {[120, 240, 360, 480, 600, 720].map((y) => (
               <line key={y} x1="0" y1={y} x2="1600" y2={y} />
             ))}
           </g>
 
-          {/* Top-left identifier */}
           <text
-            x="80"
-            y="100"
-            fontFamily="JetBrains Mono, SF Mono, monospace"
-            fontSize="14"
-            fill="#6E6E70"
-            letterSpacing="0.18em"
+            x="80" y="100"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="14"
+            fill="#6E6E70" letterSpacing="0.18em"
           >
             FALL.{caseNo} · DIAGNOSTISCHE PLATTE
           </text>
 
-          {/* Top-right tag */}
           <text
-            x="1520"
-            y="100"
-            textAnchor="end"
-            fontFamily="JetBrains Mono, SF Mono, monospace"
-            fontSize="14"
-            fill="#D4571B"
-            letterSpacing="0.18em"
+            x="1520" y="100" textAnchor="end"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="14"
+            fill="#D4571B" letterSpacing="0.18em"
           >
             MUSTER {pattern.patternCode}
           </text>
 
-          {/* Faint thin line under header */}
           <line x1="80" y1="130" x2="1520" y2="130"
             stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
 
-          {/* The hero: gigantic italic pattern code */}
           <text
-            x="800"
-            y="540"
-            textAnchor="middle"
+            x="800" y="540" textAnchor="middle"
             fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-            fontStyle="italic"
-            fontWeight="300"
-            fontSize="280"
-            fill="#0A0A0B"
-            letterSpacing="-0.04em"
+            fontStyle="italic" fontWeight="300"
+            fontSize="280" fill="#0A0A0B" letterSpacing="-0.04em"
           >
             {pattern.patternCode}
           </text>
 
-          {/* Pattern name in mono caps */}
           <text
-            x="800"
-            y="630"
-            textAnchor="middle"
-            fontFamily="JetBrains Mono, SF Mono, monospace"
-            fontSize="22"
-            fill="#0A0A0B"
-            letterSpacing="0.18em"
+            x="800" y="630" textAnchor="middle"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="22"
+            fill="#0A0A0B" letterSpacing="0.18em"
           >
             {pattern.patternName.toUpperCase()}
           </text>
 
-          {/* Sub-line: pseudonymized note */}
           <text
-            x="800"
-            y="690"
-            textAnchor="middle"
+            x="800" y="690" textAnchor="middle"
             fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-            fontStyle="italic"
-            fontWeight="300"
-            fontSize="20"
-            fill="#6E6E70"
+            fontStyle="italic" fontWeight="300"
+            fontSize="20" fill="#6E6E70"
           >
             pseudonymisierter Fall · symbolische Visualisierung
           </text>
 
-          {/* Bottom hairline */}
           <line x1="80" y1="800" x2="1520" y2="800"
             stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
 
-          {/* Bottom annotations */}
           <text
-            x="80"
-            y="840"
-            fontFamily="JetBrains Mono, SF Mono, monospace"
-            fontSize="13"
-            fill="#6E6E70"
-            letterSpacing="0.12em"
+            x="80" y="840"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="13"
+            fill="#6E6E70" letterSpacing="0.12em"
           >
             → kein klientenfoto · datenschutz
           </text>
           <text
-            x="1520"
-            y="840"
-            textAnchor="end"
-            fontFamily="JetBrains Mono, SF Mono, monospace"
-            fontSize="13"
-            fill="#6E6E70"
-            letterSpacing="0.12em"
+            x="1520" y="840" textAnchor="end"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="13"
+            fill="#6E6E70" letterSpacing="0.12em"
           >
             zahlen · gemessen · n=1
           </text>
@@ -716,12 +787,7 @@ function TypographicPlate({ caseNo, pattern }) {
       </div>
       <figcaption
         className="mt-3 font-mono"
-        style={{
-          fontSize: '11px',
-          color: 'var(--fg-muted)',
-          letterSpacing: '0.04em',
-          lineHeight: 1.55,
-        }}
+        style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.04em', lineHeight: 1.55 }}
       >
         → Diagnostische Plate · Muster {pattern.patternCode} ({pattern.patternName}) ·
         statt Klientenfoto
