@@ -35,10 +35,10 @@ export default function FingerprintIntro({ className = '' }) {
 
       {/* 2x2 grid of pattern preview cells */}
       {[
-        { x: 80,  y: 110, no: '01', l1: 'Excel-Schatten',  l2: 'CRM' },
-        { x: 420, y: 110, no: '02', l1: 'Telefon-',         l2: 'Disposition' },
-        { x: 80,  y: 320, no: '03', l1: 'WhatsApp-',        l2: 'Auftragsstrom' },
-        { x: 420, y: 320, no: '04', l1: 'Drei-Quellen-',    l2: 'Sync' },
+        { x: 80,  y: 110, no: '01', l1: 'Excel-Schatten',  l2: 'CRM',           verified: '→ in 18 betrieben' },
+        { x: 420, y: 110, no: '02', l1: 'Telefon-',         l2: 'Disposition',   verified: '→ in 14 betrieben' },
+        { x: 80,  y: 320, no: '03', l1: 'WhatsApp-',        l2: 'Auftragsstrom', verified: '→ in 12 betrieben' },
+        { x: 420, y: 320, no: '04', l1: 'Drei-Quellen-',    l2: 'Sync',          verified: '→ in 9 betrieben'  },
       ].map((cell, i) => (
         <g key={i}>
           <rect
@@ -66,7 +66,7 @@ export default function FingerprintIntro({ className = '' }) {
           <text x={cell.x + 24} y={cell.y + 158}
             fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
             fill="#8B847A" opacity="0.7" letterSpacing="0.08em">
-            → pattern verified
+            {cell.verified}
           </text>
         </g>
       ))}

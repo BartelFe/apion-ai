@@ -27,7 +27,9 @@ export const PATTERNS = [
       { value: '4.2', unit: 'h / mitarbeiter / woche' },
       { value: '~9.100 €', unit: 'mitarbeiter / jahr' },
     ],
-    annotation: 'manuelle übergaben pro tag: 12',
+    // Annotation absichtlich leer — die Zeile "manuelle übergaben pro tag: 12"
+    // steht bereits im SVG-Footer von FingerprintCRM. Sonst Doppel-Render.
+    annotation: '',
   },
   {
     id: 'phone',

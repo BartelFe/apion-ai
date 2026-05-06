@@ -338,18 +338,21 @@ function PatternText({ pattern }) {
         </div>
       </div>
 
-      {/* Bottom annotation */}
-      <div
-        className="mt-8 pt-4 font-mono"
-        style={{
-          borderTop: '0.5px solid var(--line)',
-          fontSize: '10px',
-          color: 'var(--fg-muted)',
-          letterSpacing: '0.12em',
-        }}
-      >
-        {pattern.annotation}
-      </div>
+      {/* Bottom annotation — nur wenn vorhanden (z.B. CRM-Pattern lässt
+          sie absichtlich leer, weil die Zeile bereits im SVG steht). */}
+      {pattern.annotation && (
+        <div
+          className="mt-8 pt-4 font-mono"
+          style={{
+            borderTop: '0.5px solid var(--line)',
+            fontSize: '10px',
+            color: 'var(--fg-muted)',
+            letterSpacing: '0.12em',
+          }}
+        >
+          {pattern.annotation}
+        </div>
+      )}
     </div>
   );
 }

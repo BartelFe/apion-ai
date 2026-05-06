@@ -209,7 +209,7 @@ export default function FingerprintWhiteboard({ className = '' }) {
         </g>
         <text x="548" y="402"
           fontFamily="JetBrains Mono, monospace" fontSize="9"
-          fill="#8B847A">felix.bartel@firma.de · privat</text>
+          fill="#8B847A">m.weber@firma.de · privat</text>
       </g>
 
       {/* Sync arrows BETWEEN panels (orange, top of section) */}
