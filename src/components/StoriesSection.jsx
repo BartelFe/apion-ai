@@ -1,113 +1,116 @@
 // StoriesSection.jsx — Drei Diagnosen aus der Praxis
+// Editorial-Row-Layout: jede Reihe = ein Case, click expandiert inline
+// das Detail-Panel (Bild + Diagnose-Absatz + Pull-Quote + Messung-Rows).
 //
-// Featured case: GEBRÜDER PETERS (TGA-Mittelstand, 950 MA, 8 Standorte).
-// Klarname OK für Pitch-Phase, Alex ist dort engaged. Vor Public-Launch
-// (siehe Footer-Hinweis bei den Bildern) Bildrechte sauber klären.
-//
-// Supporting cases: anonymisiert, IMPLEMENTIERT-Status — Track-Record-Beleg.
-// Sie sollen NICHT mit dem Featured-Case visuell konkurrieren; ihre Aufgabe
-// ist "wir haben das schon mehrfach geliefert", nicht "schaut auch hier".
-//
-// Theme: light/paper. Bewusster Bruch zur dunklen Diagnose-Section weiter
-// oben — Atempause durch Bildräume, nicht durch Inhaltsleere.
+// Architektur:
+// - State: ein `openCaseNo` oder null. Click auf Reihe toggelt. Andere Reihe
+//   anklicken schließt aktuelle, öffnet neue. ESC schließt alles.
+// - Layout: editorial rows (wie ein Magazin-Inhaltsverzeichnis), nicht
+//   3-up Card-Grid. Skaliert linear für n Cases.
+// - Bilder: Case 01 (GP, named) bekommt das echte GP-Projektfoto. Cases
+//   02 und 03 (pseudonymisiert) bekommen typografische SVG-Plates statt
+//   Stock-Photos — editorial-coherent, ehrlich abstrakt, brand-konsistent.
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLineReveal } from '../hooks/useScrollReveal';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// GEBRÜDER PETERS Projektfotos — kanonische wp-content/uploads URLs.
-// Sind beständig (kein /slider/cache/ Hash), aber TROTZDEM:
-// vor Public-Launch lokal selfhosten in /public/images/cases/gp-*.jpg
-// und Bildrechte mit Alex/GP klären.
-const GP_IMAGES = {
-  hero:       'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_AUDI-T02-II-BA-aspect-ratio-1-1-1024x1024.jpg',
-  schmerz:    'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/Schaltschrankbau-scaled-aspect-ratio-1-1-1024x1024.jpg',
-  resolution: 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/GM_AUDI-Forum-aspect-ratio-1-1-1024x1024.jpg',
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// CASE-DATEN — Schema ist generisch: Felix kann beliebig viele Cases hinzufügen
+// ohne Layout-Anpassung. Pflichtfelder: caseNo, status, meta, headline,
+// patterns, metric, metricUnit, metricCaption, image*, detail.intro,
+// detail.keyMetrics. Optional: client (null = pseudonymisiert), pullQuote.
+// ─────────────────────────────────────────────────────────────────────────────
 
-const FEATURED = {
-  caseNo: '01',
-  status: 'STAND Q2 2026 · DIAGNOSE-PHASE',
-  client: 'GEBRÜDER PETERS',
-  meta:   'TGA · INGOLSTADT · 950 MA · 8 STANDORTE · seit 1903',
+const GP_PHOTO = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_AUDI-T02-II-BA-aspect-ratio-1-1-1024x1024.jpg';
 
-  headline: 'Der Schaltschrankbau hatte\nsieben Excel-Listen.',
+const CASES = [
+  {
+    caseNo: '01',
+    status: 'STAND Q2 2026 · DIAGNOSE-PHASE',
+    client: 'GEBRÜDER PETERS',
+    meta: 'TGA · INGOLSTADT · 950 MA · 8 STANDORTE · seit 1903',
+    headline: 'Der Schaltschrankbau hatte sieben Excel-Listen.',
+    patterns: ['01', '04', '02'],
+    metric: '~24.700 €',
+    metricUnit: '/ jahr',
+    metricCaption: 'projizierte einsparung',
 
-  imageHeroCaption:
-    'Audi T02 II BA, Ingolstadt — eines der TGA-Mandate im Diagnose-Zeitraum.',
+    imageType: 'photo',
+    imageUrl: GP_PHOTO,
+    imageCaption: 'Audi T02 II BA, Ingolstadt — eines der TGA-Mandate im Diagnose-Zeitraum',
 
-  befund: {
-    intro:
-      'In drei Wochen Vor-Ort-Analyse haben wir bei GEBRÜDER PETERS drei Schatten-Muster identifiziert — und einen Pilot-Kandidaten priorisiert.',
-    patterns: [
-      {
-        code: 'MUSTER 01',
-        name: 'Der Excel-Schatten-CRM',
-        detail:
-          'Die Eigenfertigung Schaltschrankbau pflegt Stücklisten parallel in sieben Excel-Dateien. Die „Master-Liste" ist die achte — keine offiziell pflegt sie, aber sie ist die einzige, die alle benutzen.',
+    detail: {
+      intro: 'In drei Wochen Vor-Ort-Analyse haben wir bei GEBRÜDER PETERS drei Schatten-Muster identifiziert. Der priorisierte Pilot-Kandidat: die Eigenfertigung Schaltschrankbau, deren Stücklisten parallel in sieben Excel-Dateien gepflegt werden — die "Master-Liste" ist die achte, niemand pflegt sie offiziell, aber sie ist die einzige, die alle benutzen.',
+      pullQuote: {
+        text: 'Was wir heute in zwei Stunden machen, hätte uns früher einen Tag gekostet. Und wir hätten gar nicht gemerkt, dass wir den Tag verloren haben.',
+        attribution: 'Werkstattleitung · GEBRÜDER PETERS',
       },
-      {
-        code: 'MUSTER 04',
-        name: 'Die Drei-Quellen-Sync',
-        detail:
-          'Die Disposition koordiniert acht Standorte über Whiteboard im HQ, Excel auf dem Server, Outlook in der Cloud. Drei parallele Wahrheiten, niemand definiert als primary.',
-      },
-      {
-        code: 'MUSTER 02',
-        name: 'Die Telefon-Disposition',
-        detail:
-          'Die Service-Wartung über alle Gewerke läuft verbal — Außenmonteure rufen ins HQ, HQ ruft Standorte an. Keine Datenbank fängt den Stand ein.',
-      },
-    ],
+      keyMetrics: [
+        { label: 'Excel-Listen für Stücklisten',  ist: '7 parallel', ziel: '1 master (ERP)' },
+        { label: 'Sync-Arbeit / Woche',           ist: '11.4 h',     ziel: '~1.5 h proj.' },
+        { label: 'Manuelle Übergaben / Auftrag',  ist: '4',          ziel: '0' },
+      ],
+    },
   },
 
-  imageSchmerzCaption:
-    'Eigener Schaltschrankbau, Ingolstadt — wo sich die Excel-Listen vermehrt haben.',
-
-  pullQuote: {
-    text:
-      'Was wir heute in zwei Stunden machen, hätte uns früher einen Tag gekostet. Und wir hätten gar nicht gemerkt, dass wir den Tag verloren haben.',
-    attribution: 'Werkstattleitung · GEBRÜDER PETERS',
-  },
-
-  imageResolutionCaption:
-    'Audi Forum, Ingolstadt — laufendes TGA-Gebäudemanagement durch GEBRÜDER PETERS.',
-
-  ergebnis: {
-    rows: [
-      { label: 'Excel-Listen für Stücklisten',   ist: '7 parallel',  ziel: '1 master (ERP)' },
-      { label: 'Sync-Arbeit pro Woche',          ist: '11.4 h',       ziel: '~1.5 h projiziert' },
-      { label: 'Manuelle Übergaben pro Auftrag', ist: '4',            ziel: '0' },
-      { label: 'Disposition-Quellen aktiv',      ist: '3 parallel',   ziel: '1 primary' },
-    ],
-    saving: '~24.700 € / disposition / jahr',
-    savingCaption: 'projizierte Einsparung · gemessen in der Diagnose-Phase Q1 2026, hochgerechnet auf 12 Monate',
-  },
-};
-
-const SUPPORTING = [
   {
     caseNo: '02',
     status: 'IMPLEMENTIERT Q4 2025',
+    client: null,
     meta: 'BAUHANDWERK · SANITÄR · 22 MA · 1 STANDORT',
     headline: 'Die Materialliste, die im Lager nie ankam.',
-    summary:
-      'Außenmonteure starteten morgens mit handgeschriebenen Materiallisten, die der Lagerist nicht zuordnen konnte. Disposition organisierte täglich nach. Heute: digitalisiertes Material-Briefing, Lager-Sync, ein einziger Datenstand zwischen Werkstatt und Außendienst.',
-    delta: '−5.8 h / woche · pro monteur',
-    pattern: 'MUSTER 03 · WhatsApp-Auftragsstrom',
+    patterns: ['03'],
+    metric: '−5.8 h',
+    metricUnit: '/ wo · pro monteur',
+    metricCaption: 'gemessene einsparung',
+
+    imageType: 'typographic',
+    imageData: {
+      patternCode: '03',
+      patternName: 'WhatsApp-Auftragsstrom',
+    },
+
+    detail: {
+      intro: 'Außenmonteure starteten morgens mit handgeschriebenen Materiallisten, die der Lagerist nicht zuordnen konnte. Disposition organisierte täglich nach. Heute: digitalisiertes Material-Briefing, Lager-Sync in Echtzeit, ein einziger Datenstand zwischen Werkstatt und Außendienst.',
+      pullQuote: null,
+      keyMetrics: [
+        { label: 'Anrufe Lager → Disposition / Tag',     ist: '~14',     ziel: '~3' },
+        { label: 'Rückläufer wegen Materialfehler / Wo', ist: '2.2',     ziel: '0.4' },
+        { label: 'Stundenzettel-Erfassung / MA / Wo',    ist: '40 min',  ziel: '8 min' },
+      ],
+    },
   },
+
   {
     caseNo: '03',
     status: 'IMPLEMENTIERT Q1 2026',
+    client: null,
     meta: 'FERTIGUNG · MASCHINENBAU · 64 MA',
     headline: 'Die Freigabe, die niemand traut zu erteilen.',
-    summary:
-      'Angebote über 25 k€ hingen tagelang in der Schwebe — GF nicht erreichbar, niemand traute Entscheidungen ohne ihn. Heute: definierte Freigabe-Schwellen, automatische Eskalation, Liegezeit minus 78 %.',
-    delta: '−4.2 h / woche · entscheidungsstau',
-    pattern: 'MUSTER 02 · Telefon-Disposition',
+    patterns: ['02'],
+    metric: '−4.2 h',
+    metricUnit: '/ wo · entscheidungsstau',
+    metricCaption: 'gemessene einsparung',
+
+    imageType: 'typographic',
+    imageData: {
+      patternCode: '02',
+      patternName: 'Telefon-Disposition',
+    },
+
+    detail: {
+      intro: 'Angebote über 25 k€ hingen tagelang in der Schwebe — Geschäftsführung nicht erreichbar, niemand traute sich, Entscheidungen ohne sie zu treffen. Heute: definierte Freigabe-Schwellen je Auftragsvolumen, automatische Eskalation an Stellvertreter, durchschnittliche Liegezeit minus 78 Prozent.',
+      pullQuote: null,
+      keyMetrics: [
+        { label: 'Liegezeit Angebote > 25 k€',   ist: '3.2 tage', ziel: '0.7 tage' },
+        { label: 'Eskalations-Anrufe / Wo',      ist: '8',        ziel: '1' },
+        { label: 'Vergessene Freigaben / Monat', ist: '1.4',      ziel: '0' },
+      ],
+    },
   },
 ];
 
@@ -116,80 +119,15 @@ const SUPPORTING = [
 export default function StoriesSection() {
   const sectionRef  = useRef(null);
   const headlineRef = useLineReveal('top 72%');
+  const [openCaseNo, setOpenCaseNo] = useState(null);
 
+  // ESC schließt alle offenen Cases — accessibility expectation
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const ctx = gsap.context(() => {
-      // Bilder fade-in mit leichtem Scale-Down (gleiche Bewegung wie ManifestoSection-Foto)
-      gsap.utils.toArray('[data-case-image]').forEach((img) => {
-        gsap.fromTo(
-          img,
-          { opacity: 0, scale: 1.04 },
-          {
-            opacity: 1, scale: 1,
-            duration: 1.1, ease: 'power3.out',
-            scrollTrigger: { trigger: img, start: 'top 82%', once: true },
-          }
-        );
-      });
-
-      // Block-Aufstieg (befund, ergebnis, supporting cards)
-      gsap.utils.toArray('[data-case-block]').forEach((block) => {
-        gsap.fromTo(
-          block,
-          { y: 28, opacity: 0 },
-          {
-            y: 0, opacity: 1,
-            duration: 0.9, ease: 'power3.out',
-            scrollTrigger: { trigger: block, start: 'top 84%', once: true },
-          }
-        );
-      });
-
-      // Pull-Quote orange Bar zieht von oben aus
-      gsap.utils.toArray('[data-quote-bar]').forEach((bar) => {
-        gsap.fromTo(
-          bar,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            duration: 0.8, ease: 'power3.out',
-            transformOrigin: 'top center',
-            scrollTrigger: { trigger: bar, start: 'top 80%', once: true },
-          }
-        );
-      });
-
-      // Pattern-Listenpunkte stagger — gibt dem Befund-Block einen Rhythmus
-      gsap.utils.toArray('[data-pattern-row]').forEach((row, i) => {
-        gsap.fromTo(
-          row,
-          { x: 12, opacity: 0 },
-          {
-            x: 0, opacity: 1,
-            duration: 0.6, delay: i * 0.08, ease: 'power3.out',
-            scrollTrigger: { trigger: row, start: 'top 86%', once: true },
-          }
-        );
-      });
-
-      // Ergebnis-Rows stagger
-      gsap.utils.toArray('[data-result-row]').forEach((row, i) => {
-        gsap.fromTo(
-          row,
-          { x: 12, opacity: 0 },
-          {
-            x: 0, opacity: 1,
-            duration: 0.6, delay: i * 0.08, ease: 'power3.out',
-            scrollTrigger: { trigger: row, start: 'top 86%', once: true },
-          }
-        );
-      });
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+    if (!openCaseNo) return;
+    const handler = (e) => { if (e.key === 'Escape') setOpenCaseNo(null); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [openCaseNo]);
 
   return (
     <section
@@ -224,305 +162,238 @@ export default function StoriesSection() {
           style={{ fontSize: '13px', color: 'var(--fg-muted)', letterSpacing: '0.04em' }}
         >
           → Ein Klarname. Zwei pseudonymisiert. Alle Zahlen real.
+          <span className="ml-2" style={{ opacity: 0.6 }}>
+            · klicke auf eine Reihe für die Diagnose.
+          </span>
         </p>
       </div>
 
-      <FeaturedCase data={FEATURED} />
-
-      {/* Supporting Cases Header */}
-      <div className="max-w-6xl mx-auto mt-32 md:mt-40">
-        <div
-          className="mono-eyebrow mb-3"
-          style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
-        >
-          → weitere fälle
-        </div>
-        <p
-          className="font-mono mb-12 max-w-md"
-          style={{ fontSize: '13px', color: 'var(--fg-muted)', letterSpacing: '0.02em', lineHeight: 1.55 }}
-        >
-          Pseudonymisiert, mathematisch real. Diese beiden Fälle sind bereits
-          implementiert; die Zahlen sind gemessen, nicht projiziert.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
-          {SUPPORTING.map((c) => <SupportingCase key={c.caseNo} data={c} />)}
-        </div>
+      {/* Cases — top hairline + alle rows */}
+      <div className="max-w-6xl mx-auto">
+        <div className="h-px" style={{ background: 'var(--line-strong)' }} />
+        {CASES.map((caseData) => (
+          <CaseRow
+            key={caseData.caseNo}
+            data={caseData}
+            isOpen={openCaseNo === caseData.caseNo}
+            onToggle={() =>
+              setOpenCaseNo((prev) => (prev === caseData.caseNo ? null : caseData.caseNo))
+            }
+          />
+        ))}
       </div>
     </section>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FEATURED CASE — Editorial Foto-Strecke
+// CASE-ROW — Click-to-Expand mit GSAP-gemessener Höhen-Animation
 // ─────────────────────────────────────────────────────────────────────────────
 
-function FeaturedCase({ data }) {
+function CaseRow({ data, isOpen, onToggle }) {
+  const wrapRef    = useRef(null);
+  const contentRef = useRef(null);
+  const articleRef = useRef(null);
+
+  // Open/Close-Animation: misst echte Content-Höhe, animiert wrapper-Höhe.
+  // Fallback bei reduced-motion: sofort visible/hidden ohne Tween.
+  useEffect(() => {
+    const wrap    = wrapRef.current;
+    const content = contentRef.current;
+    if (!wrap || !content) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (isOpen) {
+      if (reduceMotion) {
+        gsap.set(wrap,    { height: 'auto' });
+        gsap.set(content, { opacity: 1, y: 0 });
+        return;
+      }
+      // Erst auf "auto" setzen für Messung, dann 0, dann animieren.
+      gsap.set(wrap, { height: 'auto' });
+      const target = wrap.offsetHeight;
+      gsap.set(wrap, { height: 0 });
+      gsap.to(wrap, {
+        height: target,
+        duration: 0.7,
+        ease: 'power3.inOut',
+        onComplete: () => { gsap.set(wrap, { height: 'auto' }); },
+      });
+      gsap.fromTo(content,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 0.18, ease: 'power3.out' }
+      );
+    } else {
+      if (reduceMotion) {
+        gsap.set(wrap, { height: 0 });
+        return;
+      }
+      // Lock current height (in px), dann auf 0 animieren.
+      gsap.set(wrap, { height: wrap.offsetHeight });
+      gsap.to(wrap, {
+        height: 0,
+        duration: 0.5,
+        ease: 'power3.inOut',
+      });
+      gsap.to(content, {
+        opacity: 0,
+        y: 8,
+        duration: 0.3,
+        ease: 'power2.in',
+      });
+    }
+  }, [isOpen]);
+
+  // Initial-Reveal beim Scrollen — die ganze Article-Box fadet rein
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (articleRef.current) articleRef.current.style.opacity = '1';
+      return;
+    }
+    const el = articleRef.current;
+    if (!el) return;
+    gsap.fromTo(el,
+      { opacity: 0, y: 16 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      }
+    );
+  }, []);
+
   return (
-    <article className="max-w-6xl mx-auto">
-      {/* Case-Header — Klarname + Meta */}
-      <header className="max-w-3xl mb-14 md:mb-20" data-case-block style={{ opacity: 0 }}>
+    <article
+      ref={articleRef}
+      style={{
+        borderBottom: '0.5px solid var(--line-strong)',
+        opacity: 0,
+      }}
+    >
+      {/* Klickbare Header-Region — ganze Reihe ist click-target */}
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={`case-detail-${data.caseNo}`}
+        className="block w-full text-left group"
+        style={{
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          padding: 'clamp(40px, 5vw, 64px) 0',
+          color: 'inherit',
+          fontFamily: 'inherit',
+        }}
+      >
+        {/* Eyebrow */}
         <div
-          className="flex items-center gap-3 font-mono text-[11px] mb-7"
-          style={{ letterSpacing: '0.18em' }}
+          className="flex items-center gap-3 font-mono mb-6 md:mb-8"
+          style={{ fontSize: '11px', letterSpacing: '0.18em' }}
         >
           <span style={{ color: '#D4571B' }}>FALL.{data.caseNo}</span>
           <span style={{ color: 'var(--line-strong)' }}>·</span>
           <span style={{ color: 'var(--fg-muted)' }}>{data.status}</span>
         </div>
+
+        {/* Headline — der Hook */}
         <h3
-          className="editorial-display whitespace-pre-line"
+          className="editorial-display transition-transform duration-500 group-hover:translate-x-1"
           style={{
-            fontSize: 'clamp(28px, 4vw, 52px)',
-            lineHeight: 1.1,
+            fontSize: 'clamp(26px, 3.8vw, 48px)',
+            lineHeight: 1.12,
             letterSpacing: '-0.015em',
+            fontStyle: 'italic',
+            fontWeight: 300,
+            maxWidth: '900px',
           }}
         >
           {data.headline}
         </h3>
-        <div className="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span
-            className="font-mono"
-            style={{ fontSize: '12px', color: 'var(--fg)', letterSpacing: '0.08em' }}
-          >
-            {data.client}
-          </span>
-          <span style={{ color: 'var(--line-strong)' }}>·</span>
-          <span
-            className="font-mono"
-            style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
-          >
-            {data.meta}
-          </span>
+
+        {/* Client + Meta */}
+        <div
+          className="mt-5 md:mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-mono"
+          style={{ fontSize: '11px', letterSpacing: '0.12em' }}
+        >
+          {data.client && (
+            <>
+              <span style={{ color: 'var(--fg)' }}>{data.client}</span>
+              <span style={{ color: 'var(--line-strong)' }}>·</span>
+            </>
+          )}
+          <span style={{ color: 'var(--fg-muted)' }}>{data.meta}</span>
         </div>
-      </header>
 
-      {/* HERO IMAGE */}
-      <CaseImage
-        src={data.imageHero || GP_IMAGES.hero}
-        alt={data.imageHeroCaption}
-        caption={data.imageHeroCaption}
-        aspectRatio="16 / 9"
-        marginBottom="mb-14 md:mb-24"
-      />
-
-      {/* BEFUND BLOCK */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 mb-14 md:mb-20"
-        data-case-block
-        style={{ opacity: 0 }}
-      >
-        <div className="md:col-span-3">
-          <div className="mono-eyebrow" style={{ color: '#D4571B', letterSpacing: '0.18em' }}>
-            → DIAGNOSE
-          </div>
-        </div>
-        <div className="md:col-span-9">
-          <p
-            className="editorial-display"
-            style={{
-              fontSize: 'clamp(18px, 2vw, 22px)',
-              lineHeight: 1.5,
-              fontWeight: 400,
-            }}
-          >
-            {data.befund.intro}
-          </p>
-          <div className="mt-10 space-y-7">
-            {data.befund.patterns.map((p, i) => (
-              <div
-                key={i}
-                data-pattern-row
-                className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-6 pb-6"
-                style={{
-                  borderBottom: i < data.befund.patterns.length - 1 ? '0.5px solid var(--line)' : 'none',
-                  opacity: 0,
-                }}
-              >
-                <div
-                  className="md:col-span-3 font-mono text-[10px]"
-                  style={{ color: '#D4571B', letterSpacing: '0.18em', paddingTop: '4px' }}
-                >
-                  {p.code}
-                </div>
-                <div className="md:col-span-9">
-                  <div
-                    className="editorial-display mb-2"
-                    style={{ fontSize: '20px', fontStyle: 'italic', fontWeight: 300 }}
-                  >
-                    {p.name}
-                  </div>
-                  <p
-                    className="font-mono"
-                    style={{
-                      fontSize: '13px',
-                      lineHeight: 1.65,
-                      color: 'var(--fg-muted)',
-                      maxWidth: '52ch',
-                    }}
-                  >
-                    {p.detail}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* SCHMERZ IMAGE */}
-      <CaseImage
-        src={data.imageSchmerz || GP_IMAGES.schmerz}
-        alt={data.imageSchmerzCaption}
-        caption={data.imageSchmerzCaption}
-        aspectRatio="4 / 3"
-        marginBottom="mb-14 md:mb-20"
-        maxWidth="max-w-4xl"
-      />
-
-      {/* PULL QUOTE */}
-      <div
-        className="mb-14 md:mb-20 max-w-3xl mx-auto"
-        data-case-block
-        style={{ opacity: 0 }}
-      >
-        <div className="grid grid-cols-12 gap-4 md:gap-6">
-          <div className="col-span-1 md:col-span-1 flex justify-center">
+        {/* Footer-Reihe: Metric · Patterns · CTA */}
+        <div className="mt-10 md:mt-14 grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-baseline">
+          {/* Metric */}
+          <div className="md:col-span-5">
             <div
-              data-quote-bar
-              style={{
-                width: '2px',
-                background: '#D4571B',
-                alignSelf: 'stretch',
-                transformOrigin: 'top center',
-              }}
-            />
-          </div>
-          <div className="col-span-11">
-            <blockquote
-              className="editorial-display"
-              style={{
-                fontSize: 'clamp(20px, 2.6vw, 30px)',
-                lineHeight: 1.4,
-                fontStyle: 'italic',
-                fontWeight: 300,
-                margin: 0,
-                color: 'var(--fg)',
-              }}
-            >
-              „{data.pullQuote.text}"
-            </blockquote>
-            <div
-              className="mt-6 font-mono"
-              style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
-            >
-              → {data.pullQuote.attribution}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* RESOLUTION IMAGE */}
-      <CaseImage
-        src={data.imageResolution || GP_IMAGES.resolution}
-        alt={data.imageResolutionCaption}
-        caption={data.imageResolutionCaption}
-        aspectRatio="21 / 9"
-        marginBottom="mb-14 md:mb-20"
-      />
-
-      {/* ERGEBNIS */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10"
-        data-case-block
-        style={{ opacity: 0 }}
-      >
-        <div className="md:col-span-3">
-          <div className="mono-eyebrow" style={{ color: '#D4571B', letterSpacing: '0.18em' }}>
-            → MESSUNG · IST vs. ZIEL
-          </div>
-        </div>
-        <div className="md:col-span-9">
-          <div className="space-y-0">
-            {data.ergebnis.rows.map((r, i) => (
-              <div
-                key={i}
-                data-result-row
-                className="grid grid-cols-12 gap-2 md:gap-4 py-4"
-                style={{
-                  borderBottom: '0.5px solid var(--line)',
-                  borderTop: i === 0 ? '0.5px solid var(--line)' : 'none',
-                  opacity: 0,
-                }}
-              >
-                <div
-                  className="col-span-12 md:col-span-5 font-mono"
-                  style={{ fontSize: '12px', color: 'var(--fg-muted)', letterSpacing: '0.04em' }}
-                >
-                  {r.label}
-                </div>
-                <div
-                  className="col-span-5 md:col-span-3 font-mono"
-                  style={{
-                    fontSize: '13px',
-                    color: 'var(--fg-muted)',
-                    textDecoration: 'line-through',
-                  }}
-                >
-                  {r.ist}
-                </div>
-                <div
-                  className="col-span-1 md:col-span-1 font-mono text-center"
-                  style={{ color: 'var(--fg-muted)' }}
-                >
-                  →
-                </div>
-                <div
-                  className="col-span-6 md:col-span-3 editorial-display"
-                  style={{
-                    fontSize: '15px',
-                    color: '#D4571B',
-                    fontStyle: 'italic',
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {r.ziel}
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Saving callout */}
-          <div className="mt-10 pt-8" style={{ borderTop: '0.5px solid var(--line-strong)' }}>
-            <div
-              className="mono-eyebrow mb-4"
+              className="mono-eyebrow mb-2"
               style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
             >
-              → projizierte einsparung
+              → {data.metricCaption}
             </div>
-            <div
-              className="editorial-display"
-              style={{
-                fontSize: 'clamp(28px, 3.6vw, 44px)',
-                color: '#D4571B',
-                lineHeight: 1.05,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {data.ergebnis.saving}
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span
+                className="editorial-display"
+                style={{
+                  fontSize: 'clamp(28px, 3.6vw, 40px)',
+                  color: '#D4571B',
+                  lineHeight: 1,
+                  fontStyle: 'italic',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {data.metric}
+              </span>
+              <span
+                className="font-mono"
+                style={{ fontSize: '12px', color: 'var(--fg-muted)', letterSpacing: '0.04em' }}
+              >
+                {data.metricUnit}
+              </span>
             </div>
-            <p
-              className="mt-3 font-mono"
-              style={{
-                fontSize: '11px',
-                color: 'var(--fg-muted)',
-                letterSpacing: '0.04em',
-                lineHeight: 1.55,
-                maxWidth: '52ch',
-                fontStyle: 'italic',
-              }}
-            >
-              {data.ergebnis.savingCaption}
-            </p>
           </div>
+
+          {/* Patterns */}
+          <div
+            className="md:col-span-4 font-mono"
+            style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
+          >
+            <span style={{ marginRight: '8px' }}>→</span>
+            {data.patterns.length === 1
+              ? <>Muster {data.patterns[0]}</>
+              : <>Muster {data.patterns.join(' · ')}</>
+            }
+          </div>
+
+          {/* CTA */}
+          <div
+            className="md:col-span-3 md:text-right font-mono"
+            style={{ fontSize: '11px', letterSpacing: '0.18em' }}
+          >
+            <span
+              className="inline-block transition-all duration-300 group-hover:translate-x-1"
+              style={{ color: isOpen ? '#D4571B' : 'var(--fg)' }}
+            >
+              {isOpen ? '→ SCHLIESSEN' : '→ FALL ÖFFNEN'}
+            </span>
+          </div>
+        </div>
+      </button>
+
+      {/* Inline-Detail-Wrapper — Höhe wird gesteuert via GSAP */}
+      <div
+        ref={wrapRef}
+        id={`case-detail-${data.caseNo}`}
+        style={{ height: 0, overflow: 'hidden' }}
+        aria-hidden={!isOpen}
+      >
+        <div ref={contentRef} style={{ opacity: 0 }}>
+          <CaseDetail data={data} />
         </div>
       </div>
     </article>
@@ -530,24 +401,158 @@ function FeaturedCase({ data }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CASE IMAGE — wiederverwendbare Bild+Caption-Box
+// CASE-DETAIL — Bild + Diagnose-Absatz + Pull-Quote + Messung-Rows
 // ─────────────────────────────────────────────────────────────────────────────
 
-function CaseImage({ src, alt, caption, aspectRatio, marginBottom = '', maxWidth = '' }) {
+function CaseDetail({ data }) {
   return (
-    <figure className={`${marginBottom} ${maxWidth} ${maxWidth ? 'mx-auto' : ''}`}>
+    <div className="pb-16 md:pb-20" style={{ paddingTop: '4px' }}>
+      {/* Bild oder Typografische Plate */}
+      {data.imageType === 'photo' ? (
+        <PhotoFigure src={data.imageUrl} caption={data.imageCaption} />
+      ) : (
+        <TypographicPlate caseNo={data.caseNo} pattern={data.imageData} />
+      )}
+
+      {/* Inhalt — 2-Spalten auf Desktop: Text links, Messung rechts */}
+      <div className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
+        {/* Linke Spalte: Diagnose + Pull-Quote */}
+        <div className="md:col-span-7">
+          <div
+            className="mono-eyebrow mb-4"
+            style={{ color: '#D4571B', letterSpacing: '0.18em' }}
+          >
+            → DIAGNOSE
+          </div>
+          <p
+            className="editorial-display"
+            style={{
+              fontSize: 'clamp(16px, 1.7vw, 20px)',
+              lineHeight: 1.65,
+              fontWeight: 400,
+              color: 'var(--fg)',
+              maxWidth: '60ch',
+            }}
+          >
+            {data.detail.intro}
+          </p>
+
+          {data.detail.pullQuote && (
+            <div className="mt-10 pl-5 relative" style={{ maxWidth: '52ch' }}>
+              <div
+                className="absolute left-0 top-1 bottom-1"
+                style={{ width: '2px', background: '#D4571B' }}
+              />
+              <blockquote
+                className="editorial-display"
+                style={{
+                  fontSize: 'clamp(17px, 1.9vw, 22px)',
+                  lineHeight: 1.45,
+                  fontStyle: 'italic',
+                  fontWeight: 300,
+                  margin: 0,
+                  color: 'var(--fg)',
+                }}
+              >
+                „{data.detail.pullQuote.text}"
+              </blockquote>
+              <div
+                className="mt-4 font-mono"
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--fg-muted)',
+                  letterSpacing: '0.12em',
+                }}
+              >
+                → {data.detail.pullQuote.attribution}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Rechte Spalte: Messung-Tabelle */}
+        <div className="md:col-span-5">
+          <div
+            className="mono-eyebrow mb-4"
+            style={{ color: '#D4571B', letterSpacing: '0.18em' }}
+          >
+            → MESSUNG · IST vs. ZIEL
+          </div>
+          <div>
+            {data.detail.keyMetrics.map((m, i) => (
+              <div
+                key={i}
+                className="py-4"
+                style={{
+                  borderBottom: '0.5px solid var(--line)',
+                  borderTop: i === 0 ? '0.5px solid var(--line)' : 'none',
+                }}
+              >
+                <div
+                  className="font-mono mb-2"
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--fg-muted)',
+                    letterSpacing: '0.06em',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {m.label}
+                </div>
+                <div className="flex items-baseline gap-3">
+                  <span
+                    className="font-mono"
+                    style={{
+                      fontSize: '13px',
+                      color: 'var(--fg-muted)',
+                      textDecoration: 'line-through',
+                      flex: '0 0 auto',
+                    }}
+                  >
+                    {m.ist}
+                  </span>
+                  <span
+                    className="font-mono"
+                    style={{ color: 'var(--fg-muted)', flex: '0 0 auto' }}
+                  >
+                    →
+                  </span>
+                  <span
+                    className="editorial-display"
+                    style={{
+                      fontSize: '15px',
+                      color: '#D4571B',
+                      fontStyle: 'italic',
+                      lineHeight: 1.3,
+                      flex: '1 1 auto',
+                    }}
+                  >
+                    {m.ziel}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PHOTO FIGURE — echtes Bild (für GP)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function PhotoFigure({ src, caption }) {
+  return (
+    <figure>
       <div
-        data-case-image
         className="relative overflow-hidden"
-        style={{
-          aspectRatio,
-          background: '#E5E1D8', // Mist-Fallback während Lade-Phase
-          opacity: 0,
-        }}
+        style={{ aspectRatio: '16 / 9', background: '#E5E1D8' }}
       >
         <img
           src={src}
-          alt={alt}
+          alt={caption}
           loading="lazy"
           decoding="async"
           style={{
@@ -560,7 +565,7 @@ function CaseImage({ src, alt, caption, aspectRatio, marginBottom = '', maxWidth
         />
       </div>
       <figcaption
-        className="mt-4 font-mono"
+        className="mt-3 font-mono"
         style={{
           fontSize: '11px',
           color: 'var(--fg-muted)',
@@ -575,104 +580,152 @@ function CaseImage({ src, alt, caption, aspectRatio, marginBottom = '', maxWidth
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SUPPORTING CASE — kompakte Karte, text-only, dichter
+// TYPOGRAPHIC PLATE — für pseudonymisierte Cases (statt Fake-Stock-Photo)
+// Editorial-Buchcover-Stil: riesige italic Pattern-Code-Zahl auf gedämpftem
+// Paper-Background, Pattern-Name in Trace-Orange als Subtitle. Brand-coherent
+// und ehrlich abstrakt.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SupportingCase({ data }) {
+function TypographicPlate({ caseNo, pattern }) {
   return (
-    <article
-      data-case-block
-      className="flex flex-col h-full"
-      style={{
-        opacity: 0,
-        paddingTop: '32px',
-        borderTop: '0.5px solid var(--line-strong)',
-      }}
-    >
-      {/* Top: case number + status */}
+    <figure>
       <div
-        className="flex items-center gap-3 font-mono text-[11px] mb-5"
-        style={{ letterSpacing: '0.18em' }}
+        className="relative overflow-hidden"
+        style={{
+          aspectRatio: '16 / 9',
+          background: '#EDE9DE',
+          border: '0.5px solid var(--line-strong)',
+        }}
       >
-        <span style={{ color: '#D4571B' }}>FALL.{data.caseNo}</span>
-        <span style={{ color: 'var(--line-strong)' }}>·</span>
-        <span style={{ color: 'var(--fg-muted)' }}>{data.status}</span>
-      </div>
+        <svg
+          viewBox="0 0 1600 900"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'block',
+          }}
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
+          {/* Faint horizontal grid for blueprint feeling */}
+          <g stroke="#0A0A0B" strokeWidth="0.5" opacity="0.04">
+            {[120, 240, 360, 480, 600, 720].map((y) => (
+              <line key={y} x1="0" y1={y} x2="1600" y2={y} />
+            ))}
+          </g>
 
-      {/* Meta */}
-      <div
-        className="font-mono mb-6"
+          {/* Top-left identifier */}
+          <text
+            x="80"
+            y="100"
+            fontFamily="JetBrains Mono, SF Mono, monospace"
+            fontSize="14"
+            fill="#6E6E70"
+            letterSpacing="0.18em"
+          >
+            FALL.{caseNo} · DIAGNOSTISCHE PLATTE
+          </text>
+
+          {/* Top-right tag */}
+          <text
+            x="1520"
+            y="100"
+            textAnchor="end"
+            fontFamily="JetBrains Mono, SF Mono, monospace"
+            fontSize="14"
+            fill="#D4571B"
+            letterSpacing="0.18em"
+          >
+            MUSTER {pattern.patternCode}
+          </text>
+
+          {/* Faint thin line under header */}
+          <line x1="80" y1="130" x2="1520" y2="130"
+            stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
+
+          {/* The hero: gigantic italic pattern code */}
+          <text
+            x="800"
+            y="540"
+            textAnchor="middle"
+            fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
+            fontStyle="italic"
+            fontWeight="300"
+            fontSize="280"
+            fill="#0A0A0B"
+            letterSpacing="-0.04em"
+          >
+            {pattern.patternCode}
+          </text>
+
+          {/* Pattern name in mono caps */}
+          <text
+            x="800"
+            y="630"
+            textAnchor="middle"
+            fontFamily="JetBrains Mono, SF Mono, monospace"
+            fontSize="22"
+            fill="#0A0A0B"
+            letterSpacing="0.18em"
+          >
+            {pattern.patternName.toUpperCase()}
+          </text>
+
+          {/* Sub-line: pseudonymized note */}
+          <text
+            x="800"
+            y="690"
+            textAnchor="middle"
+            fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
+            fontStyle="italic"
+            fontWeight="300"
+            fontSize="20"
+            fill="#6E6E70"
+          >
+            pseudonymisierter Fall · symbolische Visualisierung
+          </text>
+
+          {/* Bottom hairline */}
+          <line x1="80" y1="800" x2="1520" y2="800"
+            stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
+
+          {/* Bottom annotations */}
+          <text
+            x="80"
+            y="840"
+            fontFamily="JetBrains Mono, SF Mono, monospace"
+            fontSize="13"
+            fill="#6E6E70"
+            letterSpacing="0.12em"
+          >
+            → kein klientenfoto · datenschutz
+          </text>
+          <text
+            x="1520"
+            y="840"
+            textAnchor="end"
+            fontFamily="JetBrains Mono, SF Mono, monospace"
+            fontSize="13"
+            fill="#6E6E70"
+            letterSpacing="0.12em"
+          >
+            zahlen · gemessen · n=1
+          </text>
+        </svg>
+      </div>
+      <figcaption
+        className="mt-3 font-mono"
         style={{
           fontSize: '11px',
           color: 'var(--fg-muted)',
-          letterSpacing: '0.12em',
+          letterSpacing: '0.04em',
           lineHeight: 1.55,
         }}
       >
-        {data.meta}
-      </div>
-
-      {/* Headline */}
-      <h4
-        className="editorial-display mb-6"
-        style={{
-          fontSize: 'clamp(22px, 2.4vw, 30px)',
-          lineHeight: 1.2,
-          fontStyle: 'italic',
-          fontWeight: 300,
-          letterSpacing: '-0.01em',
-        }}
-      >
-        {data.headline}
-      </h4>
-
-      {/* Pattern reference */}
-      <div
-        className="font-mono mb-5"
-        style={{
-          fontSize: '10px',
-          color: 'var(--fg-muted)',
-          letterSpacing: '0.18em',
-        }}
-      >
-        → {data.pattern}
-      </div>
-
-      {/* Summary */}
-      <p
-        style={{
-          fontSize: '14px',
-          lineHeight: 1.65,
-          color: 'var(--fg)',
-          maxWidth: '50ch',
-        }}
-      >
-        {data.summary}
-      </p>
-
-      {/* Spacer */}
-      <div className="flex-1 min-h-[24px]" />
-
-      {/* Delta footer */}
-      <div className="pt-6" style={{ borderTop: '0.5px solid var(--line)' }}>
-        <div
-          className="mono-eyebrow mb-2"
-          style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}
-        >
-          → gemessen
-        </div>
-        <div
-          className="editorial-display"
-          style={{
-            fontSize: 'clamp(20px, 2.2vw, 28px)',
-            color: '#D4571B',
-            lineHeight: 1.1,
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {data.delta}
-        </div>
-      </div>
-    </article>
+        → Diagnostische Plate · Muster {pattern.patternCode} ({pattern.patternName}) ·
+        statt Klientenfoto
+      </figcaption>
+    </figure>
   );
 }
