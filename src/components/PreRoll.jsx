@@ -92,16 +92,33 @@ export default function PreRoll({ onComplete }) {
       if (isComplete) return;
       isComplete = true;
       if (timeline) timeline.kill();
-      gsap.to(overlayRef.current, {
-        opacity: 0,
-        duration: T.EXIT_DUR,
-        ease: 'power2.inOut',
+
+      // Layered sequential exit — Layer in umgekehrter Erscheinungs-Reihenfolge
+      // wieder loslassen, dann Overlay-BG mit subtilem Lift nach oben fade-en.
+      // ~0.9s total. Fühlt sich an wie ein bedacht hochgezogener Vorhang
+      // statt eines harten Schnitts.
+      const exitTl = gsap.timeline({
         onComplete: () => {
           sessionStorage.setItem('apion-preroll-seen', '1');
           document.body.style.overflow = originalOverflow;
           onComplete();
         },
       });
+
+      exitTl
+        .to(monoBottomRef.current,  { opacity: 0, duration: 0.35, ease: 'power2.in' }, 0)
+        .to(skipHintRef.current,    { opacity: 0, duration: 0.25, ease: 'power2.in' }, 0)
+        .to(punchlineRef.current,   { opacity: 0, y: -8, duration: 0.45, ease: 'power2.in' }, 0.08)
+        .to(freezeLineRef.current,  { scaleX: 0, transformOrigin: 'center center', duration: 0.4, ease: 'power3.in' }, 0.12)
+        .to(counterRef.current,     { opacity: 0, duration: 0.4, ease: 'power2.in' }, 0.18)
+        .to(headerRef.current,      { opacity: 0, duration: 0.35, ease: 'power2.in' }, 0.22)
+        // Overlay-BG zuletzt — fade + 16px lift nach oben (curtain rising).
+        .to(overlayRef.current, {
+          opacity: 0,
+          y: -16,
+          duration: 0.55,
+          ease: 'power3.out',
+        }, 0.35);
     };
 
     const skip = () => {
