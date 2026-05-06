@@ -15,7 +15,10 @@ const SPOKES = [
 // Position of inline time annotation: radius 145px from center, on inner side of node
 const cx = 400, cy = 300;
 
-export default function FingerprintPhone({ className = '' }) {
+export default function FingerprintPhone({ className = '', mobile = false }) {
+  // Mobile-Font-Scale, s. FingerprintIntro für Begründung.
+  const fs = (n) => (mobile && n < 13 ? n + 4 : n);
+
   return (
     <svg
       viewBox="0 0 800 600"
@@ -50,12 +53,12 @@ export default function FingerprintPhone({ className = '' }) {
 
       {/* Header tags */}
       <text x="40" y="40"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#D4571B" letterSpacing="0.18em">
         → DIE TELEFON-DISPOSITION
       </text>
       <text x="760" y="40" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         fingerprint.02 · diagnose.apion
       </text>
@@ -86,18 +89,18 @@ export default function FingerprintPhone({ className = '' }) {
               fill="#08070A" stroke="#D4571B" strokeWidth="1.2" />
             {/* Inline time label */}
             <text x={tx + timeOffset} y={ty + 4}
-              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
               fill="#D4571B" textAnchor={timeAnchor}>
               {s.time}
             </text>
             {/* Destination labels */}
             <text x={lx} y={ly}
-              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
               fill="#F5F3EE" textAnchor={labelAnchor}>
               {s.label}
             </text>
             <text x={lx} y={ly + 14}
-              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
               fill="#8B847A" textAnchor={labelAnchor}>
               {s.sub}
             </text>
@@ -128,12 +131,12 @@ export default function FingerprintPhone({ className = '' }) {
 
       {/* Bottom annotations */}
       <text x="40" y="568"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         → Σ telefonzeit / tag: 3.7 h · 14 anrufe
       </text>
       <text x="760" y="568" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         verbal-kopplung statt system
       </text>

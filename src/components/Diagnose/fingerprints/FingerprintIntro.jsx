@@ -2,7 +2,11 @@
 // Vier dashed-outline Zellen, in jeder ein typografischer Pattern-Name als "Probestempel".
 // Orange crosshair in der Mitte = der diagnostische Pivot.
 
-export default function FingerprintIntro({ className = '' }) {
+export default function FingerprintIntro({ className = '', mobile = false }) {
+  // Mobile-Font-Scale: kleine Mono-Labels (<13) wachsen um +4px,
+  // damit sie auf 360–420px-Devices noch lesbar sind.
+  const fs = (n) => (mobile && n < 13 ? n + 4 : n);
+
   // Atmospheric grid lines for blueprint feeling
   const gridH = Array.from({ length: 16 }, (_, i) => i * 40);
   const gridV = Array.from({ length: 21 }, (_, i) => i * 40);
@@ -23,12 +27,12 @@ export default function FingerprintIntro({ className = '' }) {
 
       {/* Header tags */}
       <text x="40" y="40"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         MUSTERDIAGNOSE · APION
       </text>
       <text x="760" y="40" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         4 muster · 47 betriebe
       </text>
@@ -47,7 +51,7 @@ export default function FingerprintIntro({ className = '' }) {
             strokeDasharray="2 4" opacity="0.45"
           />
           <text x={cell.x + 24} y={cell.y + 32}
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
             fill="#8B847A" letterSpacing="0.18em">
             muster {cell.no}
           </text>
@@ -64,7 +68,7 @@ export default function FingerprintIntro({ className = '' }) {
             {cell.l2}
           </text>
           <text x={cell.x + 24} y={cell.y + 158}
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
             fill="#8B847A" opacity="0.7" letterSpacing="0.08em">
             {cell.verified}
           </text>

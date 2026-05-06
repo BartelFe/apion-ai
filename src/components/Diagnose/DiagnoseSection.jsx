@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { INTRO, PATTERNS, OUTRO } from './patterns.config';
 import {
   FingerprintIntro,
@@ -25,7 +26,31 @@ function activeFromProgress(p) {
   return PHASE_BREAKS.length;
 }
 
+// Slot-Definition für die Mobile-Variante: jeder Slot ist eine eigene
+// Section. Selbe Inhalte wie Desktop, nur ohne opacity-stacking.
+const SLOTS = [
+  { type: 'intro' },
+  { type: 'pattern', pattern: PATTERNS[0] },
+  { type: 'pattern', pattern: PATTERNS[1] },
+  { type: 'pattern', pattern: PATTERNS[2] },
+  { type: 'pattern', pattern: PATTERNS[3] },
+  { type: 'outro' },
+];
+
 export default function DiagnoseSection() {
+  // <768px → Mobile-Stack, sonst Desktop-Pin/Scrub. matchMedia reagiert
+  // live auf Resize, also wechselt das Layout korrekt beim Drehen.
+  const isMobile = useMediaQuery('(max-width: 767px)');
+
+  if (isMobile) return <DiagnoseMobile />;
+  return <DiagnoseDesktop />;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DESKTOP — Pin/Scrub mit Crossfade-Phasen (bisheriges Verhalten unangetastet)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function DiagnoseDesktop() {
   const sectionRef = useRef(null);
   const stickyRef = useRef(null);
   const [active, setActive] = useState(0);
@@ -149,8 +174,82 @@ export default function DiagnoseSection() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// MOBILE — 6 stacked sections, kein Pin, kein Scrub, natural scroll.
+// Jede Section: Viz oben (~55vh) + Text drunter (auto height, min 30vh).
+// ─────────────────────────────────────────────────────────────────────────────
+
+function DiagnoseMobile() {
+  return (
+    <section
+      id="diagnose"
+      data-bg="vignette"
+      className="relative"
+      style={{
+        background: '#08070A',
+        '--fg': '#F5F3EE',
+        '--fg-muted': '#8B847A',
+        '--line': 'rgba(245, 243, 238, 0.14)',
+        '--line-strong': 'rgba(245, 243, 238, 0.32)',
+      }}
+    >
+      {SLOTS.map((slot, i) => (
+        <MobileSlot key={i} slot={slot} index={i} />
+      ))}
+    </section>
+  );
+}
+
+function MobileSlot({ slot, index }) {
+  return (
+    <div
+      className="w-full flex flex-col"
+      style={{ minHeight: '85vh' }}
+    >
+      {/* Viz top — 55vh, fingerprint mit mobile-prop für scaled-up fonts */}
+      <div
+        className="relative"
+        style={{ height: '55vh', overflow: 'hidden' }}
+      >
+        {renderFingerprint(slot, true)}
+
+        {/* Top-right phase indicator (statisch, einer pro Slot) */}
+        <div
+          className="absolute top-4 right-4 font-mono pointer-events-none"
+          style={{
+            fontSize: '10px',
+            color: 'var(--fg-muted)',
+            letterSpacing: '0.18em',
+          }}
+        >
+          {String(index + 1).padStart(2, '0')} / 06
+        </div>
+      </div>
+
+      {/* Text below — auto height, padding generous to clear ConsoleBar */}
+      <div className="px-5 pt-8 pb-12">
+        {slot.type === 'intro' && <IntroText />}
+        {slot.type === 'pattern' && <PatternText pattern={slot.pattern} />}
+        {slot.type === 'outro' && <OutroText />}
+      </div>
+    </div>
+  );
+}
+
+function renderFingerprint(slot, mobile) {
+  if (slot.type === 'intro') return <FingerprintIntro mobile={mobile} />;
+  if (slot.type === 'outro') return <FingerprintOutro mobile={mobile} />;
+  switch (slot.pattern.id) {
+    case 'crm':        return <FingerprintCRM mobile={mobile} />;
+    case 'phone':      return <FingerprintPhone mobile={mobile} />;
+    case 'whatsapp':   return <FingerprintWhatsApp mobile={mobile} />;
+    case 'whiteboard': return <FingerprintWhiteboard mobile={mobile} />;
+    default:           return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Layer wrappers — alle Phasen werden im selben Grid-Cell gerendert,
-// nur die aktive ist sichtbar (opacity 1).
+// nur die aktive ist sichtbar (opacity 1). Nur für Desktop.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FingerprintSlot({ active, children }) {

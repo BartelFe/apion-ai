@@ -2,7 +2,10 @@
 // orange Linie, in der Mitte das Wort "DER SCHATTEN". Visualisiert: vier
 // Symptome, eine Pathologie. Schliesst die Section vor der ROI-Übergabe.
 
-export default function FingerprintOutro({ className = '' }) {
+export default function FingerprintOutro({ className = '', mobile = false }) {
+  // Mobile-Font-Scale, s. FingerprintIntro für Begründung.
+  const fs = (n) => (mobile && n < 13 ? n + 4 : n);
+
   // 4 corner positions for the pattern badges (cell centers)
   const corners = [
     { cx: 230, cy: 200, no: '01', name: 'Excel-Schatten-CRM',     summary: '4.2 h / w' },
@@ -31,12 +34,12 @@ export default function FingerprintOutro({ className = '' }) {
 
       {/* Header */}
       <text x="40" y="40"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#D4571B" letterSpacing="0.18em">
         → SYNTHESE
       </text>
       <text x="760" y="40" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         diagnose abgeschlossen
       </text>
@@ -64,7 +67,7 @@ export default function FingerprintOutro({ className = '' }) {
 
           {/* Connector dot label offsets */}
           <text x={c.cx} y={c.cy - 24} textAnchor="middle"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
             fill="#8B847A" letterSpacing="0.18em">
             muster {c.no}
           </text>
@@ -75,7 +78,7 @@ export default function FingerprintOutro({ className = '' }) {
             {c.name}
           </text>
           <text x={c.cx} y={c.cy + 50} textAnchor="middle"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
             fill="#D4571B" letterSpacing="0.04em">
             {c.summary}
           </text>
@@ -90,12 +93,12 @@ export default function FingerprintOutro({ className = '' }) {
           fill="none" stroke="#D4571B" strokeWidth="0.5"
           strokeDasharray="2 3" opacity="0.6" />
         <text x="400" y="302" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#D4571B" letterSpacing="0.18em">
           DER
         </text>
         <text x="400" y="316" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
           fill="#D4571B" letterSpacing="0.18em">
           SCHATTEN
         </text>
@@ -115,12 +118,12 @@ export default function FingerprintOutro({ className = '' }) {
 
       {/* Bottom annotations */}
       <text x="40" y="568"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         → diagnose vollständig · n=47 betriebe
       </text>
       <text x="760" y="568" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#D4571B" letterSpacing="0.12em">
         → was kostet er?
       </text>

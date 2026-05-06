@@ -4,7 +4,10 @@
 // labels. One discrepancy highlighted in orange. Background: faint redundancy
 // pattern (parallel lines).
 
-export default function FingerprintWhiteboard({ className = '' }) {
+export default function FingerprintWhiteboard({ className = '', mobile = false }) {
+  // Mobile-Font-Scale, s. FingerprintIntro für Begründung.
+  const fs = (n) => (mobile && n < 13 ? n + 4 : n);
+
   return (
     <svg
       viewBox="0 0 800 600"
@@ -22,42 +25,42 @@ export default function FingerprintWhiteboard({ className = '' }) {
 
       {/* Header */}
       <text x="40" y="40"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#D4571B" letterSpacing="0.18em">
         → DIE DREI-QUELLEN-SYNC
       </text>
       <text x="760" y="40" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         fingerprint.04 · diagnose.apion
       </text>
 
       {/* Panel labels (above each panel) */}
       <text x="150" y="100" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
         fill="#F5F3EE" letterSpacing="0.12em">
         WHITEBOARD
       </text>
       <text x="150" y="116" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A">büro · physisch</text>
 
       <text x="400" y="100" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
         fill="#F5F3EE" letterSpacing="0.12em">
         EXCEL
       </text>
       <text x="400" y="116" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A">server · share</text>
 
       <text x="650" y="100" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
         fill="#F5F3EE" letterSpacing="0.12em">
         OUTLOOK
       </text>
       <text x="650" y="116" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A">cloud · privat</text>
 
       {/* Panel 1 — Whiteboard (hand-drawn feel) */}
@@ -68,13 +71,13 @@ export default function FingerprintWhiteboard({ className = '' }) {
         <rect x="42" y="137" width="216" height="276"
           fill="none" stroke="#F5F3EE" strokeWidth="0.3" opacity="0.5" />
         {/* "Day" headers */}
-        <text x="70"  y="170" fontFamily="Newsreader, serif" fontSize="11"
+        <text x="70"  y="170" fontFamily="Newsreader, serif" fontSize={fs(11)}
           fill="#F5F3EE" fontStyle="italic">Mo</text>
-        <text x="120" y="170" fontFamily="Newsreader, serif" fontSize="11"
+        <text x="120" y="170" fontFamily="Newsreader, serif" fontSize={fs(11)}
           fill="#F5F3EE" fontStyle="italic">Di</text>
-        <text x="170" y="170" fontFamily="Newsreader, serif" fontSize="11"
+        <text x="170" y="170" fontFamily="Newsreader, serif" fontSize={fs(11)}
           fill="#F5F3EE" fontStyle="italic">Mi</text>
-        <text x="215" y="170" fontFamily="Newsreader, serif" fontSize="11"
+        <text x="215" y="170" fontFamily="Newsreader, serif" fontSize={fs(11)}
           fill="#F5F3EE" fontStyle="italic">Do</text>
         {/* Horizontal divider */}
         <line x1="55" y1="180" x2="245" y2="180"
@@ -108,7 +111,7 @@ export default function FingerprintWhiteboard({ className = '' }) {
         <ellipse cx="180" cy="350" rx="48" ry="14"
           fill="#F5F3EE" opacity="0.06" />
         <text x="160" y="392"
-          fontFamily="Newsreader, serif" fontSize="11" fontStyle="italic"
+          fontFamily="Newsreader, serif" fontSize={fs(11)} fontStyle="italic"
           fill="#8B847A">letzte Änderung: gestern</text>
       </g>
 
@@ -131,16 +134,16 @@ export default function FingerprintWhiteboard({ className = '' }) {
           <line x1="290" y1="380" x2="510" y2="380" />
         </g>
         {/* Header row */}
-        <text x="313" y="167" fontFamily="JetBrains Mono, monospace" fontSize="10"
+        <text x="313" y="167" fontFamily="JetBrains Mono, monospace" fontSize={fs(10)}
           fill="#8B847A">Mo</text>
-        <text x="365" y="167" fontFamily="JetBrains Mono, monospace" fontSize="10"
+        <text x="365" y="167" fontFamily="JetBrains Mono, monospace" fontSize={fs(10)}
           fill="#8B847A">Di</text>
-        <text x="420" y="167" fontFamily="JetBrains Mono, monospace" fontSize="10"
+        <text x="420" y="167" fontFamily="JetBrains Mono, monospace" fontSize={fs(10)}
           fill="#8B847A">Mi</text>
-        <text x="475" y="167" fontFamily="JetBrains Mono, monospace" fontSize="10"
+        <text x="475" y="167" fontFamily="JetBrains Mono, monospace" fontSize={fs(10)}
           fill="#8B847A">Do</text>
         {/* Data rows — note: one cell will be highlighted orange (discrepancy) */}
-        <g fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#F5F3EE">
+        <g fontFamily="JetBrains Mono, monospace" fontSize={fs(10)} fill="#F5F3EE">
           <text x="298" y="207">Müller</text>
           <text x="350" y="207">Müller</text>
           <text x="402" y="207">Schmidt</text>
@@ -169,7 +172,7 @@ export default function FingerprintWhiteboard({ className = '' }) {
           <text x="458" y="367">Müller</text>
         </g>
         <text x="298" y="402"
-          fontFamily="JetBrains Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, monospace" fontSize={fs(9)}
           fill="#8B847A">disposition_kw37.xlsx · v.4</text>
       </g>
 
@@ -184,14 +187,14 @@ export default function FingerprintWhiteboard({ className = '' }) {
           <line x1="705" y1="135" x2="705" y2="415" />
         </g>
         {/* Time labels left */}
-        <g fontFamily="JetBrains Mono, monospace" fontSize="8" fill="#8B847A">
+        <g fontFamily="JetBrains Mono, monospace" fontSize={fs(8)} fill="#8B847A">
           <text x="548" y="195">07</text>
           <text x="548" y="245">10</text>
           <text x="548" y="295">13</text>
           <text x="548" y="345">16</text>
         </g>
         {/* Appointment blocks */}
-        <g fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#F5F3EE">
+        <g fontFamily="JetBrains Mono, monospace" fontSize={fs(9)} fill="#F5F3EE">
           {/* Mo */}
           <rect x="572" y="186" width="20" height="100" fill="#F5F3EE" opacity="0.12" stroke="#F5F3EE" strokeWidth="0.4" />
           <text x="582" y="232" textAnchor="middle">Mü</text>
@@ -208,7 +211,7 @@ export default function FingerprintWhiteboard({ className = '' }) {
           <text x="747" y="290" textAnchor="middle">Sc</text>
         </g>
         <text x="548" y="402"
-          fontFamily="JetBrains Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, monospace" fontSize={fs(9)}
           fill="#8B847A">m.weber@firma.de · privat</text>
       </g>
 
@@ -228,7 +231,7 @@ export default function FingerprintWhiteboard({ className = '' }) {
       </g>
 
       {/* Sync labels below arrows */}
-      <g fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#8B847A">
+      <g fontFamily="JetBrains Mono, monospace" fontSize={fs(9)} fill="#8B847A">
         <text x="275" y="245" textAnchor="middle">morgens</text>
         <text x="275" y="258" textAnchor="middle">per hand</text>
         <text x="525" y="245" textAnchor="middle">abends</text>
@@ -242,14 +245,14 @@ export default function FingerprintWhiteboard({ className = '' }) {
         opacity="0.6"
       />
       <text x="400" y="78" textAnchor="middle"
-        fontFamily="Newsreader, serif" fontSize="12" fontStyle="italic"
+        fontFamily="Newsreader, serif" fontSize={fs(12)} fontStyle="italic"
         fill="#8B847A">
         wenn jemand fragt
       </text>
 
       {/* Bottom annotations */}
       <text x="40" y="465"
-        fontFamily="JetBrains Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, monospace" fontSize={fs(10)}
         fill="#F5F3EE" letterSpacing="0.04em">
         → wer hat recht?
       </text>
@@ -261,12 +264,12 @@ export default function FingerprintWhiteboard({ className = '' }) {
 
       {/* Bottom-right summary */}
       <text x="40" y="568"
-        fontFamily="JetBrains Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         → Σ sync-arbeit / woche: 8.4 h
       </text>
       <text x="760" y="568" textAnchor="end"
-        fontFamily="JetBrains Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         master-quelle: keine
       </text>

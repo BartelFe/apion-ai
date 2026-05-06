@@ -12,7 +12,10 @@ const BUBBLES = [
   { x: 440, y: 375, w: 240, h: 44, kind: 'TEXT',  text: '"Müller, wo bist du?"', highlight: false },
 ];
 
-export default function FingerprintWhatsApp({ className = '' }) {
+export default function FingerprintWhatsApp({ className = '', mobile = false }) {
+  // Mobile-Font-Scale, s. FingerprintIntro für Begründung.
+  const fs = (n) => (mobile && n < 13 ? n + 4 : n);
+
   return (
     <svg
       viewBox="0 0 800 600"
@@ -28,12 +31,12 @@ export default function FingerprintWhatsApp({ className = '' }) {
 
       {/* Header tags */}
       <text x="40" y="40"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#D4571B" letterSpacing="0.18em">
         → DER WHATSAPP-AUFTRAGSSTROM
       </text>
       <text x="760" y="40" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         fingerprint.03 · diagnose.apion
       </text>
@@ -56,14 +59,14 @@ export default function FingerprintWhatsApp({ className = '' }) {
             />
             {/* Kind tag (mono, small, left-aligned inside bubble) */}
             <text x={b.x + 16} y={b.y + 18}
-              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
               fill="#8B847A" letterSpacing="0.12em">
               [{b.kind}]
             </text>
             {/* Content (mono or display, depending) */}
             {b.text && (
               <text x={b.x + 16} y={b.y + 33}
-                fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+                fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
                 fill={textColor}>
                 {b.text}
               </text>
@@ -81,7 +84,7 @@ export default function FingerprintWhatsApp({ className = '' }) {
             )}
             {/* Tiny "sender" identifier on right */}
             <text x={b.x + b.w - 16} y={b.y + 18} textAnchor="end"
-              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+              fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
               fill="#8B847A" opacity="0.7">
               {['Müller', 'Lager', 'Schmidt', 'Müller', 'Schmidt', 'Becker'][i]}
             </text>
@@ -101,7 +104,7 @@ export default function FingerprintWhatsApp({ className = '' }) {
 
       {/* Funnel annotation */}
       <text x="400" y="468" textAnchor="middle"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#D4571B" letterSpacing="0.12em">
         manuell abschreiben · abends
       </text>
@@ -111,12 +114,12 @@ export default function FingerprintWhatsApp({ className = '' }) {
         <rect x="320" y="500" width="160" height="44"
           fill="#08070A" stroke="#F5F3EE" strokeWidth="1.2" />
         <text x="400" y="522" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
           fill="#F5F3EE" letterSpacing="0.08em">
           ERP-SYSTEM
         </text>
         <text x="400" y="538" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#8B847A">
           offiziell · t+1
         </text>
@@ -124,12 +127,12 @@ export default function FingerprintWhatsApp({ className = '' }) {
 
       {/* Bottom annotations */}
       <text x="40" y="568"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         → Σ nachrichten / auftrag: 47
       </text>
       <text x="760" y="568" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         davon strukturiert: 0
       </text>

@@ -3,7 +3,10 @@
 // orange dashed arrows showing constant manual sync. One curved unofficial-sync
 // line between two Excels. Massive EXCEL watermark behind.
 
-export default function FingerprintCRM({ className = '' }) {
+export default function FingerprintCRM({ className = '', mobile = false }) {
+  // Mobile-Font-Scale, s. FingerprintIntro für Begründung.
+  const fs = (n) => (mobile && n < 13 ? n + 4 : n);
+
   return (
     <svg
       viewBox="0 0 800 600"
@@ -15,7 +18,7 @@ export default function FingerprintCRM({ className = '' }) {
       {/* Massive EXCEL watermark */}
       <text x="400" y="400" textAnchor="middle"
         fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-        fontSize="320" fontWeight="300"
+        fontSize={mobile ? 220 : 320} fontWeight="300"
         fill="#F5F3EE" fillOpacity="0.035"
         letterSpacing="-0.04em">
         EXCEL
@@ -23,12 +26,12 @@ export default function FingerprintCRM({ className = '' }) {
 
       {/* Fingerprint tag */}
       <text x="760" y="40" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#8B847A" letterSpacing="0.18em">
         fingerprint.01 · diagnose.apion
       </text>
       <text x="40" y="40"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
         fill="#D4571B" letterSpacing="0.18em">
         → DER EXCEL-SCHATTEN-CRM
       </text>
@@ -38,12 +41,12 @@ export default function FingerprintCRM({ className = '' }) {
         <rect x="340" y="270" width="120" height="60"
           fill="#08070A" stroke="#F5F3EE" strokeWidth="1.2" />
         <text x="400" y="294" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="11"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(11)}
           fill="#F5F3EE" letterSpacing="0.08em">
           CRM · SAGE
         </text>
         <text x="400" y="313" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#8B847A" letterSpacing="0.04em">
           offiziell
         </text>
@@ -54,10 +57,10 @@ export default function FingerprintCRM({ className = '' }) {
         <rect x="335" y="80" width="130" height="50"
           fill="#08070A" stroke="#F5F3EE" strokeWidth="0.5" />
         <text x="400" y="102" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
           fill="#F5F3EE">Excel · Vertrieb</text>
         <text x="400" y="118" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#8B847A">verkauf_2024.xlsx</text>
       </g>
 
@@ -66,10 +69,10 @@ export default function FingerprintCRM({ className = '' }) {
         <rect x="595" y="275" width="160" height="50"
           fill="#08070A" stroke="#F5F3EE" strokeWidth="0.5" />
         <text x="675" y="297" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
           fill="#F5F3EE">Excel · Reklamation</text>
         <text x="675" y="313" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#8B847A">reklamationen.xlsx</text>
       </g>
 
@@ -78,10 +81,10 @@ export default function FingerprintCRM({ className = '' }) {
         <rect x="335" y="470" width="130" height="50"
           fill="#08070A" stroke="#F5F3EE" strokeWidth="0.5" />
         <text x="400" y="492" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
           fill="#F5F3EE">Excel · Aufträge</text>
         <text x="400" y="508" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#D4571B">aktuelle_Liste.xlsx</text>
       </g>
 
@@ -90,10 +93,10 @@ export default function FingerprintCRM({ className = '' }) {
         <rect x="45" y="275" width="160" height="50"
           fill="#08070A" stroke="#F5F3EE" strokeWidth="0.5" />
         <text x="125" y="297" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="10"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(10)}
           fill="#F5F3EE">Excel · Stammdaten</text>
         <text x="125" y="313" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
           fill="#8B847A">kunden.xlsx</text>
       </g>
 
@@ -126,7 +129,7 @@ export default function FingerprintCRM({ className = '' }) {
       </g>
 
       {/* Cycle annotations */}
-      <g fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9" fill="#8B847A">
+      <g fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)} fill="#8B847A">
         <text x="425" y="200">tägl. 3x</text>
         <text x="525" y="284">wöch. 1x</text>
         <text x="425" y="405">2x täglich</text>
@@ -146,18 +149,18 @@ export default function FingerprintCRM({ className = '' }) {
       </text>
       <text x="595" y="186"
         fontFamily="Newsreader, serif" fontStyle="italic"
-        fontSize="11" fill="#8B847A" opacity="0.7">
+        fontSize={fs(11)} fill="#8B847A" opacity="0.7">
         zwischen Vertrieb &amp; Reklamation
       </text>
 
       {/* Bottom annotations */}
       <text x="40" y="568"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         → manuelle übergaben pro tag: 12
       </text>
       <text x="760" y="568" textAnchor="end"
-        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="9"
+        fontFamily="JetBrains Mono, SF Mono, monospace" fontSize={fs(9)}
         fill="#8B847A" letterSpacing="0.12em">
         master-quelle: ?
       </text>
