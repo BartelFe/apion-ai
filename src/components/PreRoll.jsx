@@ -66,10 +66,18 @@ export default function PreRoll({ onComplete }) {
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const url = new URL(window.location.href);
-    const skipParam = url.searchParams.get('skip-preroll');
 
-    if (reduceMotion || skipParam === '1') {
+    // URL escapes
+    const url = new URL(window.location.href);
+    const skipParam = url.searchParams.get('skip-preroll');     // dev: skip even on first visit
+    const forceParam = url.searchParams.get('force-preroll');   // pitch: force play even if seen
+
+    // Once-per-session — preserve first impression, respect returning user time
+    const alreadySeen = sessionStorage.getItem('apion-preroll-seen');
+
+    const shouldSkip = (reduceMotion || skipParam === '1' || alreadySeen) && forceParam !== '1';
+
+    if (shouldSkip) {
       onComplete();
       return;
     }
@@ -89,6 +97,7 @@ export default function PreRoll({ onComplete }) {
         duration: T.EXIT_DUR,
         ease: 'power2.inOut',
         onComplete: () => {
+          sessionStorage.setItem('apion-preroll-seen', '1');
           document.body.style.overflow = originalOverflow;
           onComplete();
         },
@@ -104,6 +113,7 @@ export default function PreRoll({ onComplete }) {
         duration: 0.3,
         ease: 'power2.out',
         onComplete: () => {
+          sessionStorage.setItem('apion-preroll-seen', '1');
           document.body.style.overflow = originalOverflow;
           onComplete();
         },
