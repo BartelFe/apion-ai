@@ -28,6 +28,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 const GP_PHOTO = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_AUDI-T02-II-BA-aspect-ratio-1-1-1024x1024.jpg';
 
+// Symbolbilder für die pseudonymisierten Cases — Unsplash CDN, editorial-
+// industriell, thematisch passend (Werkstatt/Fertigung). Vor Public-Launch
+// lokal hosten (Bildrechte sind via Unsplash-License frei für editorial use,
+// aber CDN-Hotlinking ist trotzdem suboptimal). Die Captions kennzeichnen
+// sie eindeutig als Symbolbilder, kein Klientenfoto.
+const SYMBOL_SANITAER = 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80';
+const SYMBOL_FERTIGUNG = 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80';
+
 const CASES = [
   {
     caseNo: '01',
@@ -69,11 +77,9 @@ const CASES = [
     metricUnit: '/ wo · pro monteur',
     metricCaption: 'gemessene einsparung',
 
-    imageType: 'typographic',
-    imageData: {
-      patternCode: '03',
-      patternName: 'WhatsApp-Auftragsstrom',
-    },
+    imageType: 'photo',
+    imageUrl: SYMBOL_SANITAER,
+    imageCaption: 'Werkstatt-Atmosphäre · Sanitärhandwerk — Symbolbild für anonymisierten Mandanten',
 
     detail: {
       intro: 'Außenmonteure starteten morgens mit handgeschriebenen Materiallisten, die der Lagerist nicht zuordnen konnte. Disposition organisierte täglich nach. Heute: digitalisiertes Material-Briefing, Lager-Sync in Echtzeit, ein einziger Datenstand zwischen Werkstatt und Außendienst.',
@@ -97,11 +103,9 @@ const CASES = [
     metricUnit: '/ wo · entscheidungsstau',
     metricCaption: 'gemessene einsparung',
 
-    imageType: 'typographic',
-    imageData: {
-      patternCode: '02',
-      patternName: 'Telefon-Disposition',
-    },
+    imageType: 'photo',
+    imageUrl: SYMBOL_FERTIGUNG,
+    imageCaption: 'Maschinenraum · Mittelstands-Fertigung — Symbolbild für anonymisierten Mandanten',
 
     detail: {
       intro: 'Angebote über 25 k€ hingen tagelang in der Schwebe — Geschäftsführung nicht erreichbar, niemand traute sich, Entscheidungen ohne sie zu treffen. Heute: definierte Freigabe-Schwellen je Auftragsvolumen, automatische Eskalation an Stellvertreter, durchschnittliche Liegezeit minus 78 Prozent.',
