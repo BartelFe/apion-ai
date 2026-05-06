@@ -100,17 +100,18 @@ export default function Station({ data, dimmed = false }) {
 
 function ToolSticker({ text, index, dimmed }) {
   const ref = useRef();
-  const yOffset = index * 0.32;
+  // yOffset 0.32 → 0.34: leicht mehr Abstand für die größere Sticker-Höhe.
+  const yOffset = index * 0.34;
   return (
     <group ref={ref} position={[0, yOffset, 0]}>
-      {/* Hintergrund-Plane für den Sticker */}
+      {/* Hintergrund-Plane — leicht größer + opaker für 4K-Lesbarkeit */}
       <mesh>
-        <planeGeometry args={[Math.max(0.9, text.length * 0.13), 0.24]} />
-        <meshBasicMaterial color={c3.ink} transparent opacity={dimmed ? 0.15 : 0.78} />
+        <planeGeometry args={[Math.max(1.0, text.length * 0.15), 0.28]} />
+        <meshBasicMaterial color={c3.ink} transparent opacity={dimmed ? 0.18 : 0.85} />
       </mesh>
       <Text
         position={[0, 0, 0.01]}
-        fontSize={0.13}
+        fontSize={0.15}
         color={c3.paper}
         anchorX="center"
         anchorY="middle"

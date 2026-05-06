@@ -14,7 +14,7 @@ export const STATIONS = [
     sub: 'Bauträger · Architekten',
     pos: [-6.0, 0, -4.5],
     size: [1.6, 0.9, 1.1],
-    tools: ['Outlook', 'Telefon', 'Webformular'],
+    tools: ['Outlook'],
     color: 'paper',
   },
   {
@@ -23,7 +23,7 @@ export const STATIONS = [
     sub: 'Vor-Ort-Erfassung',
     pos: [-2.2, 0, -5.5],
     size: [1.2, 0.7, 1.2],
-    tools: ['Klemmbrett', 'mh-software', 'Stift+Papier'],
+    tools: ['Klemmbrett'],
     color: 'paper',
   },
   {
@@ -32,7 +32,7 @@ export const STATIONS = [
     sub: 'Angebotserstellung',
     pos: [2.6, 0, -4.5],
     size: [1.6, 1.1, 1.1],
-    tools: ['Streit V.1', 'Excel', 'LINEAR'],
+    tools: ['Streit V.1', 'Excel'],
     color: 'paper',
   },
   {
@@ -51,7 +51,7 @@ export const STATIONS = [
     sub: 'Material',
     pos: [-5.0, 0, 4.0],
     size: [2.2, 0.8, 1.6],
-    tools: ['GC-Gruppe', 'Richter+Frenzel', 'IDS-Connect'],
+    tools: ['GC-Gruppe'],
     color: 'paper',
   },
   {
@@ -60,7 +60,7 @@ export const STATIONS = [
     sub: 'Ausführung',
     pos: [3.4, 0, 4.5],
     size: [1.8, 0.9, 1.4],
-    tools: ['WhatsApp', 'Streit Mobile', 'Foto'],
+    tools: ['WhatsApp'],
     color: 'paper',
   },
   {
@@ -69,7 +69,7 @@ export const STATIONS = [
     sub: 'Abschluss',
     pos: [6.5, 0, 1.2],
     size: [1.4, 1.0, 1.0],
-    tools: ['DATEV', 'Lexware', 'Excel'],
+    tools: ['DATEV'],
     color: 'paper',
   },
 ];

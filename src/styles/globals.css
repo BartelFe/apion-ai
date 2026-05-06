@@ -42,7 +42,16 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 
 /* Reveal-utility for line-by-line text animations */
-.reveal-line { display: block; overflow: hidden; }
+.reveal-line {
+  display: block;
+  overflow: hidden;
+  /* Diakritika (Ü/ä/ö) brauchen Atemraum oben — bei line-height 1.05 ragen
+     die zwei Punkte sonst über die line-box hinaus und werden von
+     overflow:hidden weggeclippt. padding-top + matching negative margin-top
+     gibt den Raum ohne Layout-Verschiebung. */
+  padding-top: 0.2em;
+  margin-top: -0.2em;
+}
 .reveal-line > span {
   display: inline-block;
   transform: translateY(110%);

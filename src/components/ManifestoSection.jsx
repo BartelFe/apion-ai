@@ -102,7 +102,7 @@ export default function ManifestoSection() {
         if (text) {
           const words = text.textContent.split(' ');
           text.innerHTML = words
-            .map((w) => `<span class="manifesto-word" style="display:inline-block;overflow:hidden;vertical-align:bottom;padding-right:0.25em"><span style="display:inline-block">${w}</span></span>`)
+            .map((w) => `<span class="manifesto-word" style="display:inline-block;overflow:hidden;vertical-align:bottom;padding-right:0.25em;padding-top:0.2em;margin-top:-0.2em"><span style="display:inline-block">${w}</span></span>`)
             .join('');
 
           gsap.fromTo(
