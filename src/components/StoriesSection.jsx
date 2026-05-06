@@ -26,15 +26,16 @@ gsap.registerPlugin(ScrollTrigger);
 // CASE-DATEN
 // ─────────────────────────────────────────────────────────────────────────────
 
-const GP_PHOTO = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_AUDI-T02-II-BA-aspect-ratio-1-1-1024x1024.jpg';
-
-// Symbolbilder für die pseudonymisierten Cases — Unsplash CDN, editorial-
-// industriell, thematisch passend (Werkstatt/Fertigung). Vor Public-Launch
-// lokal hosten (Bildrechte sind via Unsplash-License frei für editorial use,
-// aber CDN-Hotlinking ist trotzdem suboptimal). Die Captions kennzeichnen
-// sie eindeutig als Symbolbilder, kein Klientenfoto.
-const SYMBOL_SANITAER = 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80';
-const SYMBOL_FERTIGUNG = 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80';
+// GEBRÜDER PETERS Projektfotos — alle drei kanonisch von gebrueder-peters.de.
+// FALL.01 nutzt Audi T02 II BA als echtes Klientenfoto (GP ist namentlich
+// genannt). FALL.02 + FALL.03 nutzen GVZ Halle B und Audi Forum als
+// Symbolbilder für anonymisierte Mandanten — mit Alex/GP abgesprochen.
+// Vor Public-Launch alle drei lokal selfhosten in /public/images/cases/
+// und Bildnachweis sauber dokumentieren (AUDI AG hält Rechte am Audi-Forum-
+// Foto laut GP-Referenzseite, GVZ-Foto ist GP-eigenes Material).
+const GP_AUDI_T02      = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_AUDI-T02-II-BA-aspect-ratio-1-1-1024x1024.jpg';
+const GP_HALLE_B_GVZ   = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/ET_GVZ_Ingolstadt-aspect-ratio-1-1.png';
+const GP_AUDI_FORUM    = 'https://www.gebrueder-peters.de/wp-content/uploads/2022/12/GM_AUDI-Forum-aspect-ratio-1-1-1024x1024.jpg';
 
 const CASES = [
   {
@@ -49,7 +50,7 @@ const CASES = [
     metricCaption: 'projizierte einsparung',
 
     imageType: 'photo',
-    imageUrl: GP_PHOTO,
+    imageUrl: GP_AUDI_T02,
     imageCaption: 'Audi T02 II BA, Ingolstadt — eines der TGA-Mandate im Diagnose-Zeitraum',
 
     detail: {
@@ -78,8 +79,8 @@ const CASES = [
     metricCaption: 'gemessene einsparung',
 
     imageType: 'photo',
-    imageUrl: SYMBOL_SANITAER,
-    imageCaption: 'Werkstatt-Atmosphäre · Sanitärhandwerk — Symbolbild für anonymisierten Mandanten',
+    imageUrl: GP_HALLE_B_GVZ,
+    imageCaption: 'Halle B, GVZ Ingolstadt — Symbolbild für anonymisierten Mandanten',
 
     detail: {
       intro: 'Außenmonteure starteten morgens mit handgeschriebenen Materiallisten, die der Lagerist nicht zuordnen konnte. Disposition organisierte täglich nach. Heute: digitalisiertes Material-Briefing, Lager-Sync in Echtzeit, ein einziger Datenstand zwischen Werkstatt und Außendienst.',
@@ -104,8 +105,8 @@ const CASES = [
     metricCaption: 'gemessene einsparung',
 
     imageType: 'photo',
-    imageUrl: SYMBOL_FERTIGUNG,
-    imageCaption: 'Maschinenraum · Mittelstands-Fertigung — Symbolbild für anonymisierten Mandanten',
+    imageUrl: GP_AUDI_FORUM,
+    imageCaption: 'Audi Forum, Ingolstadt — Symbolbild für anonymisierten Mandanten',
 
     detail: {
       intro: 'Angebote über 25 k€ hingen tagelang in der Schwebe — Geschäftsführung nicht erreichbar, niemand traute sich, Entscheidungen ohne sie zu treffen. Heute: definierte Freigabe-Schwellen je Auftragsvolumen, automatische Eskalation an Stellvertreter, durchschnittliche Liegezeit minus 78 Prozent.',
