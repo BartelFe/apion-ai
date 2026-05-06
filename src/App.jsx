@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLenis } from './hooks/useLenis';
 import BgStage from './components/BgStage';
 import Nav from './components/Nav';
+import PreRoll from './components/PreRoll';
 import Hero from './components/Hero';
 import DiagnoseSection from './components/Diagnose/DiagnoseSection';
 import ROISection from './components/ROISection';
@@ -20,6 +21,10 @@ gsap.registerPlugin(ScrollTrigger);
 export default function App() {
   useLenis();
 
+  // PreRoll-Aktenkarte vor Hero-Mount. Component fadet sich selbst aus
+  // bevor onComplete feuert — DOM-Removal danach erzeugt keinen Flash.
+  const [preRollDone, setPreRollDone] = useState(false);
+
   useEffect(() => {
     // Race document.fonts.ready gegen 1500ms Timeout — falls eine Font hängt
     // (langsames CDN, Glitch), läuft ScrollTrigger.refresh() trotzdem und
@@ -32,6 +37,7 @@ export default function App() {
 
   return (
     <>
+      {!preRollDone && <PreRoll onComplete={() => setPreRollDone(true)} />}
       <BgStage />
       <Nav />
       <main>
