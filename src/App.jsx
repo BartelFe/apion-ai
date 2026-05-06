@@ -5,7 +5,7 @@ import { useLenis } from './hooks/useLenis';
 import BgStage from './components/BgStage';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
-import DiagnoseSection from './components/DiagnoseSection';
+import DiagnoseSection from './components/Diagnose/DiagnoseSection';
 import ROISection from './components/ROISection';
 import StoriesSection from './components/StoriesSection';
 import MethodSection from './components/MethodSection';

@@ -154,13 +154,13 @@ html.lenis, html.lenis body { height: auto; }
     flex: 1 1 0%;
   }
 }
+/* Note: kein display:flex / justify-content hier — die neue DiagnoseSection
+   nutzt CSS Grid für die Phase-Overlays (s. inline style auf
+   .diagnose-text-panel). flex/justify-content würden Grid-Layouting brechen. */
 .diagnose-text-panel {
   flex: 1 1 0%;
   background: #06060A;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 @media (min-width: 768px) {
   .diagnose-text-panel {
