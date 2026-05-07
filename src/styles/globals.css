@@ -123,20 +123,6 @@ html.lenis, html.lenis body { height: auto; }
   }
 }
 
-/* Stories horizontal scroll track */
-.stories-track {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  cursor: grab;
-  user-select: none;
-}
-.stories-track:active { cursor: grabbing; }
-.stories-track::-webkit-scrollbar { display: none; }
-
 /* Founder photo: portrait crop, responsive height */
 .founder-photo-wrap {
   height: 280px;

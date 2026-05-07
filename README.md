@@ -45,30 +45,40 @@ Das ist auch der Grund, warum die Übergänge butter-smooth sind: Es gibt kein S
 
 ```
 src/
-├── App.jsx                       — Komposition
+├── App.jsx                       — Komposition + PreRoll-Gate
 ├── main.jsx                      — Entry
 ├── styles/globals.css            — Tailwind + Brand-Variables + Reveal-Utilities
 ├── lib/tokens.js                 — Brand-Tokens (Farben, Modi, Motion)
 ├── hooks/
 │   ├── useLenis.js               — Smooth-Scroll Setup
+│   ├── useMediaQuery.js          — SSR-safe matchMedia hook
 │   └── useScrollReveal.js        — Wiederverwendbare Reveal-Hooks
 └── components/
     ├── BgStage.jsx               — Globaler Hintergrund + Modus-Manager
     ├── Nav.jsx                   — Top-Navigation mit Backdrop-Blur
     ├── Logo.jsx                  — APION SVG-Logo
-    ├── Hero.jsx                  — Hero mit 3D-Netzwerk
-    ├── DiagnoseSection.jsx       — DAS Award-Modul · Pinned Scroll-Build-Up
-    ├── ROISection.jsx            — Editorial-ROI-Rechner
-    ├── StoriesSection.jsx        — 3 Geschichten in Vignette-Modus
-    ├── MethodSection.jsx         — 4-Phasen-Sequenz
-    ├── ManifestoSection.jsx      — Brand-Statements mit Dark-Insel
-    ├── CollaborationSection.jsx  — Klare Phasen der Zusammenarbeit
+    ├── PreRoll.jsx               — Pitch-Vorhang (Billing-Meter, einmal pro Session)
+    ├── Hero.jsx                  — Hero-Root (Desktop/Mobile-Switch)
+    ├── Hero/                     — Hero-Subkomponenten
+    │   ├── HeroScene.jsx         — R3F-Canvas + SelectiveBloom
+    │   ├── ScrollChoreography.js — 4-Akt GSAP-Master-Timeline
+    │   ├── audio/AudioManager.js — Audio-Stub
+    │   ├── constants/            — stations + flows config
+    │   ├── fallback/HeroMobile.jsx — 2D-SVG-Variante <768px
+    │   ├── hud/                  — DataHUD + Headline
+    │   └── scene/                — World, Station, Connections, Particles
+    ├── Diagnose/                 — Musterdiagnose (Pin/Scrub Desktop · Carousel Mobile)
+    │   ├── DiagnoseSection.jsx   — Section-Root mit Mobile-Switch
+    │   ├── patterns.config.js    — 4 Schatten-Muster + Intro/Outro
+    │   └── fingerprints/         — 6 SVG-Fingerprints (Intro · 4 Patterns · Outro)
+    ├── ROISection.jsx            — Editorial-ROI-Rechner mit Slidern
+    ├── StoriesSection.jsx        — 3 Editorial-Rows mit Click-to-Expand
+    ├── MethodSection.jsx         — 4-Phasen-Sequenz mit Scrub-Linie
+    ├── ManifestoSection.jsx      — Brand-Statements mit Dark-Insel + Founder-Photo
+    ├── CollaborationSection.jsx  — 4 Phasen der Zusammenarbeit
     ├── CTASection.jsx            — Finaler CTA in Vignette
-    ├── Footer.jsx                — Standard-Footer
-    ├── ConsoleBar.jsx            — Live-Ticker am unteren Rand
-    └── 3d/
-        ├── HeroDiagram.jsx       — 3D-Netzwerk im Hero
-        └── DiagnoseDiagram.jsx   — 3D-Netzwerk mit Scroll-Progress
+    ├── Footer.jsx                — Standard-Footer mit Dev-Warn für Placeholder-Links
+    └── ConsoleBar.jsx            — Live-Ticker am unteren Rand
 ```
 
 ## Sektionen-Reihenfolge & Hell-Dunkel-Rhythmus

@@ -2,7 +2,6 @@ import { forwardRef, useRef, useImperativeHandle, useEffect, useState } from 're
 import { Canvas, useThree } from '@react-three/fiber';
 import { EffectComposer, SelectiveBloom, Selection } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
-import * as THREE from 'three';
 import World from './scene/World';
 
 // Innerer Wrapper damit wir useThree() für Camera/Scene haben.

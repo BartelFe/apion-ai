@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import HeroScene from './Hero/HeroScene';
 import HeroMobile from './Hero/fallback/HeroMobile';
 import Headline from './Hero/hud/Headline';
 import DataHUD from './Hero/hud/DataHUD';
 import { createHeroChoreography } from './Hero/ScrollChoreography';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 // Root-Hero-Komponente.
 // Desktop: 3D-Welt mit pin/scrub-basierter 4-Akt-Choreografie.
@@ -12,16 +13,7 @@ import { createHeroChoreography } from './Hero/ScrollChoreography';
 export default function Hero() {
   // Desktop-Layout (50/50-Grid mit echter 3D-Welt) ab 768px (Tailwind md:).
   // Darunter: 2D-SVG-Fallback mit Stack-Layout.
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' && window.innerWidth < 768
-  );
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
+  const isMobile = useMediaQuery('(max-width: 767px)');
   if (isMobile) return <HeroMobile />;
   return <HeroDesktop />;
 }

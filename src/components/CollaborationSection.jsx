@@ -106,7 +106,7 @@ export default function CollaborationSection() {
     >
       <div className="max-w-5xl mx-auto" ref={headlineRef}>
         <div className="mono-eyebrow" style={{ color: 'var(--fg-muted)' }}>
-          06 · zusammenarbeit
+          06 · leistungen
         </div>
         <h2
           className="editorial-display mt-7"

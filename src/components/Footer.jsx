@@ -13,12 +13,20 @@ const LEGAL_LINKS = [
 
 export default function Footer() {
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      const impressum = LEGAL_LINKS.find(([label]) => label === 'Impressum');
-      if (impressum && impressum[1] === '#') {
-        console.warn('[Footer] TODO: Impressum href="#" — link to actual page before launch.');
-      }
-    }
+    if (!import.meta.env.DEV) return;
+    // Audit every footer link group for placeholder hrefs (#)
+    const groups = [
+      ['Rechtliches', LEGAL_LINKS],
+      ['Unternehmen', [['Über APION', '#manifesto'], ['Karriere', '#'], ['Kontakt', '#cta']]],
+      ['Sprache', [['DE · aktiv', '#'], ['EN', '#']]],
+    ];
+    groups.forEach(([groupName, links]) => {
+      links.forEach(([label, href]) => {
+        if (href === '#') {
+          console.warn(`[Footer] TODO: ${groupName} > "${label}" href="#" — link to actual page before launch.`);
+        }
+      });
+    });
   }, []);
 
   return (

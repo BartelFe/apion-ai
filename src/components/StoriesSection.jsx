@@ -253,15 +253,18 @@ function CaseRow({ data, isOpen, onToggle }) {
     }
     const el = articleRef.current;
     if (!el) return;
-    gsap.fromTo(el,
-      { opacity: 0, y: 16 },
-      {
-        opacity: 1, y: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-      }
-    );
+    const ctx = gsap.context(() => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1, y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+        }
+      );
+    }, el);
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -291,15 +294,7 @@ function CaseRow({ data, isOpen, onToggle }) {
 
           {/* Bild-Spalte */}
           <div className="md:col-span-4">
-            {data.imageType === 'photo' ? (
-              <RowImage src={data.imageUrl} alt={data.imageCaption} isOpen={isOpen} />
-            ) : (
-              <RowPlate
-                caseNo={data.caseNo}
-                pattern={data.imageData}
-                isOpen={isOpen}
-              />
-            )}
+            <RowImage src={data.imageUrl} alt={data.imageCaption} isOpen={isOpen} />
           </div>
 
           {/* Text-Spalte */}
@@ -452,93 +447,6 @@ function RowImage({ src, alt, isOpen }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ROW PLATE — typografisches 3:2 Thumbnail (für pseudonymisierte Cases)
-// Buchcover-Stil: italic Pattern-Code-Hero, mono caps darunter, kleine
-// header- und footer-Annotationen. Kompakt aber lesbar.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function RowPlate({ caseNo, pattern, isOpen }) {
-  return (
-    <div
-      className="relative overflow-hidden transition-all duration-500"
-      style={{
-        aspectRatio: '3 / 2',
-        background: '#EDE9DE',
-        border: '0.5px solid var(--line-strong)',
-        outline: isOpen ? '0.5px solid #D4571B' : '0.5px solid transparent',
-        outlineOffset: '0',
-      }}
-    >
-      <svg
-        viewBox="0 0 1200 800"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ width: '100%', height: '100%', display: 'block' }}
-        preserveAspectRatio="xMidYMid meet"
-        aria-hidden="true"
-      >
-        {/* Faint horizontal grid */}
-        <g stroke="#0A0A0B" strokeWidth="0.5" opacity="0.04">
-          {[120, 240, 360, 480, 600, 720].map((y) => (
-            <line key={y} x1="0" y1={y} x2="1200" y2={y} />
-          ))}
-        </g>
-
-        {/* Top-left: FALL.XX */}
-        <text
-          x="60" y="100"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="40"
-          fill="#6E6E70" letterSpacing="0.18em"
-        >
-          FALL.{caseNo}
-        </text>
-
-        {/* Top-right: MUSTER XX (orange accent) */}
-        <text
-          x="1140" y="100" textAnchor="end"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="40"
-          fill="#D4571B" letterSpacing="0.18em"
-        >
-          MUSTER {pattern.patternCode}
-        </text>
-
-        {/* Faint divider under header */}
-        <line x1="60" y1="140" x2="1140" y2="140"
-          stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
-
-        {/* The hero: gigantic italic pattern code, centered */}
-        <text
-          x="600" y="500" textAnchor="middle"
-          fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-          fontStyle="italic" fontWeight="300"
-          fontSize="320" fill="#0A0A0B" letterSpacing="-0.04em"
-        >
-          {pattern.patternCode}
-        </text>
-
-        {/* Pattern name in mono caps */}
-        <text
-          x="600" y="600" textAnchor="middle"
-          fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="36"
-          fill="#0A0A0B" letterSpacing="0.18em"
-        >
-          {pattern.patternName.toUpperCase()}
-        </text>
-
-        {/* Bottom annotation */}
-        <text
-          x="600" y="720" textAnchor="middle"
-          fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-          fontStyle="italic" fontWeight="300"
-          fontSize="36" fill="#6E6E70"
-        >
-          pseudonymisierter Fall
-        </text>
-      </svg>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // CASE-DETAIL — expandiert inline · Hero-Bild + Diagnose + Quote + Messung
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -546,11 +454,7 @@ function CaseDetail({ data }) {
   return (
     <div className="pb-16 md:pb-20" style={{ paddingTop: '4px' }}>
       {/* Hero-Bild */}
-      {data.imageType === 'photo' ? (
-        <PhotoFigure src={data.imageUrl} caption={data.imageCaption} />
-      ) : (
-        <TypographicPlate caseNo={data.caseNo} pattern={data.imageData} />
-      )}
+      <PhotoFigure src={data.imageUrl} caption={data.imageCaption} />
 
       {/* 2-Spalten unter dem Bild */}
       <div className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-12">
@@ -698,105 +602,3 @@ function PhotoFigure({ src, caption }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TYPOGRAPHIC PLATE — Detail-Größe (16:9 hero)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function TypographicPlate({ caseNo, pattern }) {
-  return (
-    <figure>
-      <div
-        className="relative overflow-hidden"
-        style={{
-          aspectRatio: '16 / 9',
-          background: '#EDE9DE',
-          border: '0.5px solid var(--line-strong)',
-        }}
-      >
-        <svg
-          viewBox="0 0 1600 900"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ width: '100%', height: '100%', display: 'block' }}
-          preserveAspectRatio="xMidYMid meet"
-          aria-hidden="true"
-        >
-          <g stroke="#0A0A0B" strokeWidth="0.5" opacity="0.04">
-            {[120, 240, 360, 480, 600, 720].map((y) => (
-              <line key={y} x1="0" y1={y} x2="1600" y2={y} />
-            ))}
-          </g>
-
-          <text
-            x="80" y="100"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="14"
-            fill="#6E6E70" letterSpacing="0.18em"
-          >
-            FALL.{caseNo} · DIAGNOSTISCHE PLATTE
-          </text>
-
-          <text
-            x="1520" y="100" textAnchor="end"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="14"
-            fill="#D4571B" letterSpacing="0.18em"
-          >
-            MUSTER {pattern.patternCode}
-          </text>
-
-          <line x1="80" y1="130" x2="1520" y2="130"
-            stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
-
-          <text
-            x="800" y="540" textAnchor="middle"
-            fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-            fontStyle="italic" fontWeight="300"
-            fontSize="280" fill="#0A0A0B" letterSpacing="-0.04em"
-          >
-            {pattern.patternCode}
-          </text>
-
-          <text
-            x="800" y="630" textAnchor="middle"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="22"
-            fill="#0A0A0B" letterSpacing="0.18em"
-          >
-            {pattern.patternName.toUpperCase()}
-          </text>
-
-          <text
-            x="800" y="690" textAnchor="middle"
-            fontFamily="Newsreader, Iowan Old Style, Charter, Georgia, serif"
-            fontStyle="italic" fontWeight="300"
-            fontSize="20" fill="#6E6E70"
-          >
-            pseudonymisierter Fall · symbolische Visualisierung
-          </text>
-
-          <line x1="80" y1="800" x2="1520" y2="800"
-            stroke="#0A0A0B" strokeWidth="0.5" opacity="0.15" />
-
-          <text
-            x="80" y="840"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="13"
-            fill="#6E6E70" letterSpacing="0.12em"
-          >
-            → kein klientenfoto · datenschutz
-          </text>
-          <text
-            x="1520" y="840" textAnchor="end"
-            fontFamily="JetBrains Mono, SF Mono, monospace" fontSize="13"
-            fill="#6E6E70" letterSpacing="0.12em"
-          >
-            zahlen · gemessen · n=1
-          </text>
-        </svg>
-      </div>
-      <figcaption
-        className="mt-3 font-mono"
-        style={{ fontSize: '11px', color: 'var(--fg-muted)', letterSpacing: '0.04em', lineHeight: 1.55 }}
-      >
-        → Diagnostische Plate · Muster {pattern.patternCode} ({pattern.patternName}) ·
-        statt Klientenfoto
-      </figcaption>
-    </figure>
-  );
-}
