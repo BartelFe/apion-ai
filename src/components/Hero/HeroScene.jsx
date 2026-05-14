@@ -15,16 +15,16 @@ function SceneInner({ worldRef, cameraSetterRef }) {
     const aspect = size.width / size.height;
     // Distance-Faktor: bei portrait (schmal) Kamera weiter weg, bei landscape näher.
     // Iso-Richtung bleibt: Komponenten x/y/z im konstanten Verhältnis.
-    // Aspect-aware Pullback. Sehr portrait (Tablet 768–1023px mit der
-    // schmalen 3D-Spalte) muss aggressiver zurückfahren, sonst clipped's.
-    // Quasi-square Aspekte (0.70-0.85, typisch 2K-Monitore) bleiben nah dran
-    // damit die Welt nicht im weiten Canvas verloren wirkt.
+    // Aspect-aware Pullback. Camera muss WEIT genug zurück bleiben damit
+    // die langen Station-Labels (z.B. "Lager / Großhandel") + Bezier-Pfade
+    // auf der negativ-x-Seite nicht aus dem Frustum klippen. Quasi-square
+    // Aspekte kriegen einen sehr leichten Zoom-In via 0.70-tier.
     const distFactor = aspect >= 1.0 ? 1.0
-                     : aspect >= 0.85 ? 1.05
-                     : aspect >= 0.70 ? 1.10
-                     : aspect >= 0.55 ? 1.30
-                     : aspect >= 0.42 ? 1.55
-                     : aspect >= 0.32 ? 1.90
+                     : aspect >= 0.85 ? 1.10
+                     : aspect >= 0.70 ? 1.20
+                     : aspect >= 0.55 ? 1.40
+                     : aspect >= 0.42 ? 1.60
+                     : aspect >= 0.32 ? 1.95
                      : 2.40;
     const baseX = 11, baseY = 13, baseZ = 19;
     camera.position.set(baseX * distFactor, baseY * distFactor, baseZ * distFactor);
