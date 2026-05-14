@@ -69,7 +69,7 @@ export default function ROISection() {
 
         <h2
           className="editorial-display mt-7"
-          style={{ fontSize: 'clamp(32px, 4.4vw, 60px)', maxWidth: '780px' }}
+          style={{ fontSize: 'clamp(32px, 4.4vw, 76px)', maxWidth: '780px' }}
         >
           <span className="reveal-line"><span>Übersetzen wir den unsichtbaren</span></span>
           <span className="reveal-line"><span>Betrieb in <em>Stunden</em>. Und in <em>Geld</em>.</span></span>
@@ -184,7 +184,7 @@ function Output({ label, value, caption, trace = false }) {
       <div className="font-mono text-[10px]" style={{ color: trace ? '#D4571B' : 'var(--fg-muted)', letterSpacing: '0.12em' }}>
         {label}
       </div>
-      <div className="editorial-display mt-2" style={{ fontSize: 'clamp(36px, 4vw, 56px)', color: trace ? '#D4571B' : 'var(--fg)' }}>
+      <div className="editorial-display mt-2" style={{ fontSize: 'clamp(36px, 4vw, 72px)', color: trace ? '#D4571B' : 'var(--fg)' }}>
         {value}
       </div>
       <div className="font-mono text-[11px] mt-2" style={{ color: 'var(--fg-muted)', letterSpacing: '0.04em' }}>

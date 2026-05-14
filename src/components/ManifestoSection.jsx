@@ -186,7 +186,7 @@ export default function ManifestoSection() {
                         data-stmt-text
                         className="editorial-display"
                         style={{
-                          fontSize: 'clamp(22px, 2.8vw, 38px)',
+                          fontSize: 'clamp(22px, 2.8vw, 52px)',
                           lineHeight: 1.25,
                           color: '#F5F3EE',
                         }}
@@ -230,7 +230,7 @@ export default function ManifestoSection() {
                     data-stmt-text
                     className="editorial-display"
                     style={{
-                      fontSize: 'clamp(24px, 3.2vw, 44px)',
+                      fontSize: 'clamp(24px, 3.2vw, 56px)',
                       lineHeight: 1.25,
                       color: 'var(--fg)',
                     }}

@@ -533,7 +533,7 @@ function IntroText() {
       <h2
         className="editorial-display mt-6 whitespace-pre-line"
         style={{
-          fontSize: 'clamp(26px, 3.8vw, 44px)',
+          fontSize: 'clamp(26px, 3.8vw, 60px)',
           color: 'var(--fg)',
           lineHeight: 1.18,
         }}
@@ -543,7 +543,7 @@ function IntroText() {
       <p
         className="editorial-display mt-3"
         style={{
-          fontSize: 'clamp(20px, 2.6vw, 30px)',
+          fontSize: 'clamp(20px, 2.6vw, 40px)',
           color: 'var(--fg-muted)',
           fontStyle: 'italic',
           fontWeight: 300,
@@ -586,7 +586,7 @@ function PatternText({ pattern }) {
       <h2
         className="editorial-display mt-4"
         style={{
-          fontSize: 'clamp(26px, 3.4vw, 40px)',
+          fontSize: 'clamp(26px, 3.4vw, 56px)',
           color: 'var(--fg)',
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
@@ -656,7 +656,7 @@ function PatternText({ pattern }) {
             <div key={i} className="flex items-baseline gap-3">
               <span
                 className="editorial-display"
-                style={{ fontSize: 'clamp(20px, 2vw, 26px)', color: '#D4571B', lineHeight: 1 }}
+                style={{ fontSize: 'clamp(20px, 2vw, 34px)', color: '#D4571B', lineHeight: 1 }}
               >
                 {d.value}
               </span>
@@ -706,7 +706,7 @@ function OutroText() {
       <h2
         className="editorial-display mt-6 whitespace-pre-line"
         style={{
-          fontSize: 'clamp(28px, 4vw, 48px)',
+          fontSize: 'clamp(28px, 4vw, 64px)',
           color: 'var(--fg)',
           lineHeight: 1.12,
           letterSpacing: '-0.015em',
@@ -718,7 +718,7 @@ function OutroText() {
       <p
         className="editorial-display mt-4"
         style={{
-          fontSize: 'clamp(18px, 2.2vw, 26px)',
+          fontSize: 'clamp(18px, 2.2vw, 36px)',
           color: 'var(--fg-muted)',
           fontStyle: 'italic',
           fontWeight: 300,

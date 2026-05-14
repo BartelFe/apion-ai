@@ -43,10 +43,15 @@ const Headline = forwardRef(function Headline(_, ref) {
   return (
     <div
       ref={rootRef}
-      className="absolute z-20 left-10 top-28 pointer-events-none"
+      className="absolute z-20 left-10 pointer-events-none"
       // Hartes Limit: H1 darf nie in die rechte Spalte (3D-Welt) bluten.
       // 24px Buffer zur Spalten-Grenze.
-      style={{ maxWidth: 'calc(50vw - 64px)' }}
+      // Top-Position skaliert mit Viewport-Höhe — auf 1440h+ rückt die
+      // Headline mittiger statt oben-links anchored zu wirken.
+      style={{
+        maxWidth: 'calc(50vw - 64px)',
+        top: 'clamp(7rem, 16vh, 240px)',
+      }}
     >
       <div className="mono-eyebrow mb-6" style={{ color: 'var(--fg-muted)' }}>
         00 · der unsichtbare betrieb
@@ -54,7 +59,7 @@ const Headline = forwardRef(function Headline(_, ref) {
       <h1
         className="editorial-display"
         style={{
-          fontSize: 'clamp(28px, 3.6vw, 56px)',
+          fontSize: 'clamp(28px, 3.6vw, 96px)',
           lineHeight: 1.05,
           // Container respektiert maxWidth, aber overflow:visible erlaubt
           // dem Bleed-Wort die Spalten-Grenze zu überschreiten.

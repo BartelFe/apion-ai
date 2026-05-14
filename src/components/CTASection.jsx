@@ -50,7 +50,7 @@ export default function CTASection() {
         <h2
           className="editorial-display mt-9"
           style={{
-            fontSize: 'clamp(36px, 5vw, 80px)',
+            fontSize: 'clamp(36px, 5vw, 96px)',
             color: 'var(--fg)',
           }}
         >

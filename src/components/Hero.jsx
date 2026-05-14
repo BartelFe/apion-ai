@@ -94,7 +94,7 @@ function HeroDesktop() {
             Spalte → optisches Overlap, kein Click-Konflikt. */}
         <div
           className="absolute top-0 bottom-0"
-          style={{ left: '44vw', right: 'clamp(200px, 17vw, 320px)' }}
+          style={{ left: '40vw', right: 'clamp(180px, 15vw, 280px)' }}
         >
           <div className="absolute inset-0">
             <HeroScene ref={sceneRef} />

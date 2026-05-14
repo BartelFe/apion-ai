@@ -17,12 +17,14 @@ function SceneInner({ worldRef, cameraSetterRef }) {
     // Iso-Richtung bleibt: Komponenten x/y/z im konstanten Verhältnis.
     // Aspect-aware Pullback. Sehr portrait (Tablet 768–1023px mit der
     // schmalen 3D-Spalte) muss aggressiver zurückfahren, sonst clipped's.
+    // Quasi-square Aspekte (0.70-0.85, typisch 2K-Monitore) bleiben nah dran
+    // damit die Welt nicht im weiten Canvas verloren wirkt.
     const distFactor = aspect >= 1.0 ? 1.0
-                     : aspect >= 0.85 ? 1.10
-                     : aspect >= 0.70 ? 1.22
-                     : aspect >= 0.55 ? 1.40
-                     : aspect >= 0.42 ? 1.60
-                     : aspect >= 0.32 ? 1.95
+                     : aspect >= 0.85 ? 1.05
+                     : aspect >= 0.70 ? 1.10
+                     : aspect >= 0.55 ? 1.30
+                     : aspect >= 0.42 ? 1.55
+                     : aspect >= 0.32 ? 1.90
                      : 2.40;
     const baseX = 11, baseY = 13, baseZ = 19;
     camera.position.set(baseX * distFactor, baseY * distFactor, baseZ * distFactor);

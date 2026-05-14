@@ -107,7 +107,7 @@ export default function MethodSection() {
         </div>
         <h2
           className="editorial-display mt-7"
-          style={{ fontSize: 'clamp(32px, 4.4vw, 60px)', maxWidth: '820px' }}
+          style={{ fontSize: 'clamp(32px, 4.4vw, 76px)', maxWidth: '820px' }}
         >
           <span className="reveal-line"><span>Vier Phasen.</span></span>
           <span className="reveal-line"><span>Keine davon ist verhandelbar.</span></span>
@@ -138,7 +138,7 @@ export default function MethodSection() {
                   <div className="font-mono text-[10px] mb-3" style={{ color: 'var(--fg-muted)', letterSpacing: '0.18em' }}>
                     {phase.no} · phase
                   </div>
-                  <div className="editorial-display mb-2" style={{ fontSize: 'clamp(28px, 2.6vw, 36px)' }}>
+                  <div className="editorial-display mb-2" style={{ fontSize: 'clamp(28px, 2.6vw, 48px)' }}>
                     {phase.title}
                   </div>
                   <div className="font-mono italic mb-5" style={{ fontSize: '13px', color: 'var(--fg-muted)' }}>

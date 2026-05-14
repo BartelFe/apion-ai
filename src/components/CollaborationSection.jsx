@@ -110,7 +110,7 @@ export default function CollaborationSection() {
         </div>
         <h2
           className="editorial-display mt-7"
-          style={{ fontSize: 'clamp(32px, 4.4vw, 60px)', maxWidth: '780px' }}
+          style={{ fontSize: 'clamp(32px, 4.4vw, 76px)', maxWidth: '780px' }}
         >
           <span className="reveal-line"><span>Klarer Einstieg.</span></span>
           <span className="reveal-line"><span>Klarer Ausstieg.</span></span>
@@ -129,7 +129,7 @@ export default function CollaborationSection() {
               </div>
 
               <div data-step-title className="md:col-span-3" style={{ opacity: 0 }}>
-                <div className="editorial-display" style={{ fontSize: 'clamp(24px, 2.4vw, 32px)' }}>
+                <div className="editorial-display" style={{ fontSize: 'clamp(24px, 2.4vw, 44px)' }}>
                   {step.title}
                 </div>
                 <div className="mt-2 font-mono text-[11px] flex flex-col gap-0.5" style={{ color: 'var(--fg-muted)' }}>

@@ -153,7 +153,7 @@ export default function StoriesSection() {
         </div>
         <h2
           className="editorial-display mt-7"
-          style={{ fontSize: 'clamp(32px, 4.4vw, 60px)', maxWidth: '780px' }}
+          style={{ fontSize: 'clamp(32px, 4.4vw, 76px)', maxWidth: '780px' }}
         >
           <span className="reveal-line"><span>Drei Betriebe.</span></span>
           <span className="reveal-line"><span>Drei Diagnosen.</span></span>
@@ -313,7 +313,7 @@ function CaseRow({ data, isOpen, onToggle }) {
             <h3
               className="editorial-display transition-transform duration-500 group-hover:translate-x-1"
               style={{
-                fontSize: 'clamp(24px, 3.2vw, 40px)',
+                fontSize: 'clamp(24px, 3.2vw, 52px)',
                 lineHeight: 1.12,
                 letterSpacing: '-0.015em',
                 fontStyle: 'italic',
@@ -351,7 +351,7 @@ function CaseRow({ data, isOpen, onToggle }) {
                   <span
                     className="editorial-display"
                     style={{
-                      fontSize: 'clamp(26px, 3.2vw, 36px)',
+                      fontSize: 'clamp(26px, 3.2vw, 48px)',
                       color: '#D4571B',
                       lineHeight: 1,
                       fontStyle: 'italic',

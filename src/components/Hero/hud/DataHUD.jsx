@@ -23,8 +23,8 @@ const DataHUD = forwardRef(function DataHUD(_, ref) {
       {/* HUD oben rechts: live counter */}
       <div className="absolute z-20 right-5 top-20 md:right-10 md:top-28 pointer-events-none flex flex-col items-end gap-3">
         <div
-          className="font-mono text-[10px] flex items-center gap-2"
-          style={{ color: 'var(--fg-muted)', letterSpacing: '0.15em' }}
+          className="font-mono flex items-center gap-2"
+          style={{ fontSize: 'clamp(10px, 0.55vw, 14px)', color: 'var(--fg-muted)', letterSpacing: '0.15em' }}
         >
           <span
             className="w-1.5 h-1.5 rounded-full"
@@ -83,21 +83,21 @@ const DataHUD = forwardRef(function DataHUD(_, ref) {
         }}
       >
         <div
-          className="font-mono text-[10px] mb-1.5 flex items-center gap-2"
-          style={{ color: '#D4571B', letterSpacing: '0.15em' }}
+          className="font-mono mb-1.5 flex items-center gap-2"
+          style={{ fontSize: 'clamp(10px, 0.55vw, 14px)', color: '#D4571B', letterSpacing: '0.15em' }}
         >
           <span className="w-1 h-1 rounded-full" style={{ background: '#D4571B' }} />
           auftrag {NAMED_AUFTRAG.id} · live
         </div>
         <div
           className="editorial-display"
-          style={{ fontSize: '14px', lineHeight: 1.3, color: 'var(--fg)' }}
+          style={{ fontSize: 'clamp(14px, 1.1vw, 22px)', lineHeight: 1.3, color: 'var(--fg)' }}
         >
           {NAMED_AUFTRAG.label}
         </div>
         <div
-          className="font-mono text-[11px] mt-1.5 flex justify-between"
-          style={{ color: 'var(--fg-muted)' }}
+          className="font-mono mt-1.5 flex justify-between"
+          style={{ fontSize: 'clamp(11px, 0.6vw, 14px)', color: 'var(--fg-muted)' }}
         >
           <span>volumen · {NAMED_AUFTRAG.volume}</span>
           <span>eingang · {NAMED_AUFTRAG.enteredAt}</span>
@@ -119,20 +119,20 @@ function HudRow({ label, value, unit, trace, highlight }) {
   return (
     <div className="flex flex-col items-end gap-0.5">
       <span
-        className="font-mono text-[10px]"
-        style={{ color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
+        className="font-mono"
+        style={{ fontSize: 'clamp(10px, 0.55vw, 14px)', color: 'var(--fg-muted)', letterSpacing: '0.12em' }}
       >
         {label}
       </span>
       <span
         className="editorial-display flex items-baseline gap-1.5"
-        style={{ fontSize: 'clamp(20px, 2vw, 28px)', color, lineHeight: 1 }}
+        style={{ fontSize: 'clamp(20px, 2.4vw, 56px)', color, lineHeight: 1 }}
       >
         {value}
         {unit && (
           <span
-            className="font-mono text-[10px]"
-            style={{ color: 'var(--fg-muted)', letterSpacing: '0.05em' }}
+            className="font-mono"
+            style={{ fontSize: 'clamp(10px, 0.55vw, 14px)', color: 'var(--fg-muted)', letterSpacing: '0.05em' }}
           >
             {unit}
           </span>
